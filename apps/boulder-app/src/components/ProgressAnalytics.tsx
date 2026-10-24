@@ -7,7 +7,7 @@ import { GRADE_COLORS, GRADES, MEMBER_COLORS, gradeLabel } from '../domain/catal
 import { GradePill } from './GradePill';
 import { Pill, Row, SectionTitle, Surface } from './ui';
 
-const Segmented = styled.div`display:flex;gap:3px;padding:4px;border-radius:11px;background:var(--color-surface-subtle);`;
+const Segmented = styled.div`display:flex;flex-wrap:wrap;gap:3px;padding:4px;border-radius:11px;background:var(--color-surface-subtle);`;
 const Segment = styled.button<{ $active:boolean }>`padding:7px 11px;border:0;border-radius:8px;background:${({$active})=>$active?'var(--color-surface)':'transparent'};color:${({$active})=>$active?'var(--color-text-primary)':'var(--color-text-muted)'};font-size:12px;font-weight:600;box-shadow:${({$active})=>$active?'0 1px 3px #2b22301a':'none'};cursor:pointer;`;
 const Filters = styled.div`display:flex;gap:6px;overflow:auto;padding:2px 1px 5px;`;
 const Filter = styled.button<{ $active:boolean; $grade?:Grade }>`display:inline-flex;align-items:center;gap:6px;min-height:34px;padding:4px 8px;white-space:nowrap;border:1px solid ${({$active})=>$active?'var(--color-outline)':'var(--color-border)'};border-radius:10px;background:${({$active})=>$active?'var(--color-highlight-soft)':'var(--color-surface)'};font-size:11px;cursor:pointer;.hold-icon{width:22px;height:20px}`;
@@ -19,7 +19,7 @@ const Axis = styled.div`display:flex;justify-content:space-around;margin-top:8px
 const Key = styled.div`display:flex;gap:13px;flex-wrap:wrap;margin-top:15px;`;
 const KeyItem = styled.span`display:inline-flex;align-items:center;gap:6px;color:var(--color-text-secondary);font-size:12px;.dot{width:9px;height:9px;border-radius:50%}`;
 const ChartDescription = styled.p`margin:14px 0 0;padding-top:12px;border-top:1px solid var(--color-border);color:var(--color-text-muted);font-size:11px;`;
-const FilterRow = styled.div`display:flex;gap:12px;align-items:center;overflow:auto;margin:14px 0 8px;`;
+const FilterRow = styled.div`display:flex;flex-direction:column;gap:6px;align-items:flex-start;margin:14px 0 8px;`;
 
 export function ProgressAnalytics({ sends, members, range, onRange, selectedGrade, onGrade, memberFilter, onMemberFilter, variant='crew', gradeDisplay='color' }: {
   sends:Send[]; members:Member[]; range:TimeRange; onRange:(range:TimeRange)=>void; selectedGrade:Grade|'all'; onGrade:(grade:Grade|'all')=>void;
