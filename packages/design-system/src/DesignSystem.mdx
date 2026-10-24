@@ -29,6 +29,8 @@ The tokens are defined in `src/tokens/`. Each layer answers a different question
 | Semantic | What role does a value play in the interface? | `--color-surface`, `--color-text-primary`, `--space-card-inset` |
 | Component | How does a reusable component apply those roles? | `--component-button-primary-background`, `--component-card-radius` |
 
+Viewport breakpoints are exported from `@crux/design-system/breakpoints` for use in media query conditions. They are JavaScript tokens because CSS custom properties cannot be used in `@media` rules.
+
 Prefer a semantic token in app and component styles. Change a palette by remapping semantic roles in `semantic.css`; reserve primitive values for palette definitions and token previews. Add component tokens when a shared component needs a stable, independently tunable value.
 
 ### Color palette
@@ -48,6 +50,12 @@ Use the semantic type roles for interface text and the primitive type scale when
 Primitive spacing uses a four-pixel base step. Semantic spacing names express intent, such as a card inset or section gap; component tokens can tune a reusable component without changing the scale.
 
 <Canvas of={TokenStories.SpacingScale} />
+
+### Responsive breakpoints
+
+Use the shared viewport widths to keep responsive transitions consistent across the app. The values are named by the layout range they support and are intended for `max-width` media queries.
+
+<Canvas of={TokenStories.Breakpoints} />
 
 ## Shared components
 

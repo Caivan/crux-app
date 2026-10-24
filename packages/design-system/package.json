@@ -8,6 +8,10 @@
       "types": "./src/index.d.ts",
       "import": "./src/index.js"
     },
+    "./breakpoints": {
+      "types": "./src/tokens/breakpoints.d.ts",
+      "import": "./src/tokens/breakpoints.js"
+    },
     "./tokens.css": "./src/tokens/index.css",
     "./illustrations": "./src/illustrations/index.js"
   },
