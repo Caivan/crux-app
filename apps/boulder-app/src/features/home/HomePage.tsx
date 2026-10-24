@@ -1,4 +1,3 @@
-import { Avatar } from '@crux/design-system';
 import { mediaQueries } from '@crux/design-system/breakpoints';
 import type { AppSection, CruxData, Grade, Member, Send, TimeRange } from '@crux/shared-types';
 import { useMemo, useState } from 'react';
@@ -10,14 +9,14 @@ import { GradePill } from '../../components/GradePill';
 import { ProgressAnalytics, HighestLevelChart } from '../../components/ProgressAnalytics';
 import { Icon } from '../../components/Icons';
 import { Button, Eyebrow, Grid, PageDescription, PageTitle, Pill, SectionTitle, StatLabel, StatValue, Surface } from '../../components/ui';
+import { MonthlyPodium } from './MonthlyPodium';
 
 const Hero = styled.div`display:flex;justify-content:space-between;align-items:flex-start;flex-direction:column;gap:20px;margin:10px 0 27px;@media ${mediaQueries.md}{align-items:flex-end;flex-direction:row}`;
 const ActionRow = styled.div`display:flex;gap:8px;flex-wrap:wrap;`;
-const StatCard = styled(Surface)`position:relative;min-height:126px;display:grid;align-content:space-between;gap:18px;overflow:hidden;&:after{content:'✳';position:absolute;right:15px;top:4px;color:var(--color-highlight-strong);opacity:.27;font-size:52px}`;
+const StatCard = styled(Surface)`position:relative;min-height:100px;padding:14px 16px;display:grid;align-content:space-between;gap:10px;overflow:hidden;&:after{content:'✳';position:absolute;right:12px;top:3px;color:var(--color-highlight-strong);opacity:.2;font-size:30px} ${StatValue}{font-size:24px}`;
 const StatFooter = styled.div`display:flex;align-items:center;gap:9px;color:var(--color-highlight);font-size:12px;font-weight:600;`;
 const ContentGrid = styled.div`display:grid;grid-template-columns:minmax(0,1fr);gap:18px;margin-top:18px;@media ${mediaQueries.lg}{grid-template-columns:minmax(0,1.55fr) minmax(280px,.85fr)}`;
 const Stack = styled.div`display:grid;gap:18px;min-width:0;`;
-const LeaderRow = styled.button`display:grid;width:100%;grid-template-columns:32px 42px minmax(0,1fr) auto;align-items:center;gap:10px;padding:12px 0;border:0;border-bottom:1px solid var(--color-border);background:transparent;text-align:left;cursor:pointer;&:last-child{border-bottom:0}.rank{color:var(--color-text-muted);font:12px var(--font-family-mono)}.member{font-weight:700}.sub{display:block;color:var(--color-text-muted);font-size:11px}.score{font:700 17px var(--font-family-display)}.score small{display:block;color:var(--color-text-muted);text-align:right;font:10px var(--font-family-mono)}`;
 const ActivityRow = styled.div`display:grid;grid-template-columns:42px minmax(0,1fr) auto;align-items:center;gap:11px;padding:12px 0;border-bottom:1px solid var(--color-border);&:last-child{border-bottom:0}.name{font-weight:700}.detail{display:block;color:var(--color-text-muted);font-size:11px}.score{font-weight:700;color:var(--color-green,#557d4a)}`;
 const SectionHeader = styled.div`display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:9px;`;
 const TextLink = styled.button`padding:5px 0;border:0;color:var(--color-action-secondary);background:transparent;font-weight:700;cursor:pointer;`;
@@ -37,6 +36,7 @@ export function HomePage({ data, sends, members, onLogSend, onScan, onNavigate, 
   return <>
     <Hero><div><Eyebrow>Same wall, different ways up</Eyebrow><PageTitle>Welcome to <span>{data.crew.name}</span></PageTitle><PageDescription>A little progress is still progress. Let’s celebrate it together.</PageDescription></div>
       <ActionRow><Button $variant="secondary" onClick={onScan}><Icon name="scan"/> Scan route</Button><Button onClick={onLogSend}><Icon name="add"/> Log a send</Button></ActionRow></Hero>
+    <MonthlyPodium standings={leaderboard.slice(0,3)} monthName={monthName} onViewProfile={onViewProfile}/>
     <Grid $min="195px" $gap="14px">
       <StatCard><StatLabel>TOTAL CREW SENDS</StatLabel><StatValue>{sends.length}</StatValue><StatFooter><Icon name="send" size={15}/>{monthSends.length} this month</StatFooter></StatCard>
       <StatCard><StatLabel>MEMBERS IN THE CREW</StatLabel><StatValue>{data.crew.memberIds.length}</StatValue><StatFooter><Icon name="crew" size={15}/>One wall, lots of beta</StatFooter></StatCard>
@@ -47,14 +47,10 @@ export function HomePage({ data, sends, members, onLogSend, onScan, onNavigate, 
       <ProgressAnalytics sends={sends} members={members} range={range} onRange={setRange} selectedGrade={grade} onGrade={setGrade} memberFilter={memberFilter} onMemberFilter={setMemberFilter}/>
       <HighestLevelChart sends={memberFilter==='all'?sends:sends.filter((send)=>send.memberId===memberFilter)} range={range}/>
       <Surface><SectionHeader><div><Eyebrow>Fresh Sends</Eyebrow><SectionTitle>Just off the wall</SectionTitle></div><TextLink onClick={()=>onNavigate('problems')}>All problems ↗</TextLink></SectionHeader>
-        {latest.map((send)=>{const member=memberById(send.memberId),problem=problemById(send.problemId);return <ActivityRow key={send.id}><GradePill grade={send.grade} compact/><div><span className="name">{member?.name} sent {problem?.name??'a manual send'}</span><span className="detail">{dateLabel(send.date)} · {send.attempt==='flash'?'Flash':send.attempt==='second'?'Second attempt':'Third or later'}{send.riskTaker?' · Risk Taker':''}</span></div><span className="score">{send.points} pts</span></ActivityRow>})}
+        {latest.map((send)=>{const member=memberById(send.memberId),problem=problemById(send.problemId);return <ActivityRow key={send.id}><GradePill grade={send.grade} compact iconOnly/><div><span className="name">{member?.name} sent {problem?.name??'a manual send'}</span><span className="detail">{dateLabel(send.date)} · {send.attempt==='flash'?'Flash':send.attempt==='second'?'Second attempt':'Third or later'}{send.riskTaker?' · Risk Taker':''}</span></div><span className="score">{send.points} pts</span></ActivityRow>})}
         {!latest.length&&<span>No sends yet. Log the crew’s first!</span>}
       </Surface>
     </Stack><Stack>
-      <Surface><SectionHeader><div><Eyebrow>Friendly competition</Eyebrow><SectionTitle>{monthName} leaderboard</SectionTitle></div><Pill $tone="orange"><Icon name="trophy" size={14}/>Resets monthly</Pill></SectionHeader>
-        {leaderboard.map(({member,points,sends:count},index)=><LeaderRow type="button" key={member.id} onClick={()=>onViewProfile(member.id)}><span className="rank">{String(index+1).padStart(2,'0')}</span><span className="avatar-wrap"><Avatar person={member}/></span><span><span className="member">{member.name}{member.role==='admin'?' · Admin':''}</span><span className="sub">{count} sends this month</span></span><span className="score">{points}<small>points</small></span></LeaderRow>)}
-        <TextLink onClick={()=>onNavigate('crew')}>View full crew board ↗</TextLink>
-      </Surface>
       <Surface><SectionHeader><div><Eyebrow>Grade mix</Eyebrow><SectionTitle>Where the sends land</SectionTitle></div></SectionHeader>
         <Grid $min="95px" $gap="9px">{GRADES.map(({grade:level})=>{const count=monthSends.filter((send)=>send.grade===level).length;return <div key={level} style={{padding:10,borderRadius:12,background:'var(--color-surface-subtle)'}}><GradePill grade={level} compact/><div style={{marginTop:8,font:'700 21px var(--font-family-display)'}}>{count}<small style={{font:'11px var(--font-family-mono)',color:'var(--color-text-muted)'}}> sends</small></div><div style={{height:3,marginTop:5,borderRadius:3,background:count?GRADE_COLORS[level]:'var(--color-border)',width:`${Math.max(count?12:0,Math.min(100,count*20))}%`}}/></div>})}</Grid>
         <GradeLegend><Pill $tone="green">Explorer · {data.problems.filter((problem)=>problem.explorerIds.includes(data.currentMemberId)).length} insignias</Pill></GradeLegend>
