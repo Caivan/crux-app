@@ -17,7 +17,7 @@ const PodiumEntry = styled.button<{ $place:number; $color:string; $tint:string }
   .climber .avatar{width:64px!important;height:64px!important;border:3px solid ${({$color})=>$color};border-radius:50%;box-shadow:0 3px 0 ${({$color})=>$color}55;}
   .climber .svg-markup{display:block;width:64px;height:64px;}
   .name{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;font-weight:700;color:var(--color-text-primary)}
-  .points{font:700 14px var(--font-family-display);color:var(--color-text-primary)}
+  .points{font:700 14px var(--font-family-display);color:var(--color-highlight-strong)}
   .points small{font:10px var(--font-family-mono);color:var(--color-text-muted)}
   &:focus-visible{outline:3px solid var(--color-outline);outline-offset:2px;border-radius:12px}
 `;
