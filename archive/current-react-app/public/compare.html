@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Crux — version comparison</title>
+    <style>
+      *{box-sizing:border-box}html,body{height:100%;margin:0;font:14px system-ui,sans-serif;color:#28242b;background:#f5f1e9}.toolbar{height:54px;display:flex;align-items:center;gap:12px;padding:0 16px;background:#fffefa;border-bottom:1px solid #ddd5dc}.toolbar strong{margin-right:auto}.toolbar button,.toolbar a{font:600 12px system-ui,sans-serif;color:#554356;background:#f6f2f5;border:1px solid #d9cedb;border-radius:7px;padding:8px 12px;text-decoration:none;cursor:pointer}.toolbar button[aria-pressed=true]{background:#e6d9ea;border-color:#9569a2}.stage{height:calc(100% - 54px)}iframe{width:100%;height:100%;border:0;background:#f6f5f0;display:none}iframe.active{display:block}.note{font-size:11px;color:#77716f;margin-left:8px}
+    </style>
+  </head>
+  <body>
+    <header class="toolbar"><strong>Crux visual comparison</strong><button type="button" data-version="previous" aria-pressed="true">Previous version</button><button type="button" data-version="react" aria-pressed="false">React version</button><a href="/previous-version/index.html" target="_blank" rel="noreferrer">Open previous ↗</a><a href="/" target="_blank" rel="noreferrer">Open React ↗</a><span class="note">Switch versions at the same viewport size.</span></header>
+    <main class="stage"><iframe class="active" title="Previous vanilla version" src="/previous-version/index.html"></iframe><iframe title="React version" src="/"></iframe></main>
+    <script>
+      const frames=[...document.querySelectorAll('iframe')],buttons=[...document.querySelectorAll('[data-version]')];
+      buttons.forEach((button,index)=>button.addEventListener('click',()=>{buttons.forEach((b,i)=>b.setAttribute('aria-pressed',String(i===index)));frames.forEach((frame,i)=>frame.classList.toggle('active',i===index));}));
+    </script>
+  </body>
+</html>

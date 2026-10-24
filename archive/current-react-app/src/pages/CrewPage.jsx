@@ -1,0 +1,8 @@
+import { Avatar, Button, HoldIcon, Surface } from '@crux/design-system';
+import { GRADES } from '../config/design.js';
+
+export function CrewPage({ members, sends, getRoute, onAddFriend, onProfile, completed, uniqueSends }) {
+  return <section className="page active-page"><div className="page-title-row"><div><p className="eyebrow">SAME WALL, DIFFERENT WAYS UP</p><h1>Your <span>crew</span></h1><p className="subheading">Celebrate the sends, cheer on the projects.</p></div><Button icon="＋" onClick={onAddFriend}>Add a friend</Button></div>
+    <Surface className="crew-card"><div className="crew-breakdown-title"><div><p className="eyebrow">GRADE BY GRADE</p><h2>Problems sent</h2></div><span>Completed boulders per climber</span></div><div className="crew-table-head"><span className="crew-head-person">CLIMBER</span>{GRADES.map((grade) => <span className="grade-column-head" key={grade}><HoldIcon grade={grade} small/><small>{grade}</small></span>)}<span className="grade-total-head">TOTAL</span></div>{members.map((person) => <div className="crew-row" key={person.id}><button className="crew-person profile-trigger" aria-label={`View ${person.name}'s profile`} onClick={() => onProfile(person.id)}><Avatar person={person}/><span><strong>{person.name}</strong><small>{person.id === 'you' ? 'That’s you' : 'Crew member'}</small></span></button>{GRADES.map((grade) => <div className={`grade-count ${completed(person.id, grade) ? 'has-count' : ''}`} data-level={grade} key={grade}><span>{completed(person.id, grade)}</span></div>)}<div className="grade-total">{uniqueSends(sends, person.id)}</div></div>)}</Surface><div className="crew-note">✳ Progress is personal. The leaderboard just makes the group chat more fun.</div>
+  </section>;
+}
