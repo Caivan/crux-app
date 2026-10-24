@@ -1,4 +1,5 @@
 import { Avatar } from '@crux/design-system';
+import { breakpoints } from '@crux/design-system/breakpoints';
 import type { AppSection, CruxData, Grade, Member, Send, TimeRange } from '@crux/shared-types';
 import { useMemo, useState } from 'react';
 import styled from 'styled-components';
@@ -10,11 +11,11 @@ import { ProgressAnalytics, HighestLevelChart } from '../../components/ProgressA
 import { Icon } from '../../components/Icons';
 import { Button, Eyebrow, Grid, PageDescription, PageTitle, Pill, SectionTitle, StatLabel, StatValue, Surface } from '../../components/ui';
 
-const Hero = styled.div`display:flex;justify-content:space-between;align-items:flex-end;gap:20px;margin:10px 0 27px;@media(max-width:540px){align-items:flex-start;flex-direction:column}`;
+const Hero = styled.div`display:flex;justify-content:space-between;align-items:flex-end;gap:20px;margin:10px 0 27px;@media(max-width:${breakpoints.narrow}){align-items:flex-start;flex-direction:column}`;
 const ActionRow = styled.div`display:flex;gap:8px;flex-wrap:wrap;`;
 const StatCard = styled(Surface)`position:relative;min-height:126px;display:grid;align-content:space-between;gap:18px;overflow:hidden;&:after{content:'✳';position:absolute;right:15px;top:4px;color:var(--color-highlight-strong);opacity:.27;font-size:52px}`;
 const StatFooter = styled.div`display:flex;align-items:center;gap:9px;color:var(--color-highlight);font-size:12px;font-weight:600;`;
-const ContentGrid = styled.div`display:grid;grid-template-columns:minmax(0,1.55fr) minmax(280px,.85fr);gap:18px;margin-top:18px;@media(max-width:1050px){grid-template-columns:1fr}`;
+const ContentGrid = styled.div`display:grid;grid-template-columns:minmax(0,1.55fr) minmax(280px,.85fr);gap:18px;margin-top:18px;@media(max-width:${breakpoints.wide}){grid-template-columns:minmax(0,1fr)}`;
 const Stack = styled.div`display:grid;gap:18px;min-width:0;`;
 const LeaderRow = styled.button`display:grid;width:100%;grid-template-columns:32px 42px minmax(0,1fr) auto;align-items:center;gap:10px;padding:12px 0;border:0;border-bottom:1px solid var(--color-border);background:transparent;text-align:left;cursor:pointer;&:last-child{border-bottom:0}.rank{color:var(--color-text-muted);font:12px var(--font-family-mono)}.member{font-weight:700}.sub{display:block;color:var(--color-text-muted);font-size:11px}.score{font:700 17px var(--font-family-display)}.score small{display:block;color:var(--color-text-muted);text-align:right;font:10px var(--font-family-mono)}`;
 const ActivityRow = styled.div`display:grid;grid-template-columns:42px minmax(0,1fr) auto;align-items:center;gap:11px;padding:12px 0;border-bottom:1px solid var(--color-border);&:last-child{border-bottom:0}.name{font-weight:700}.detail{display:block;color:var(--color-text-muted);font-size:11px}.score{font-weight:700;color:var(--color-green,#557d4a)}`;
