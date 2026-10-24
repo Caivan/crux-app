@@ -1,0 +1,17 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+
+body { margin: 0; font-family: var(--font-family-body); color: var(--color-text-primary); }
+.storybook-canvas { min-height: 100vh; padding: 2rem; background: var(--color-canvas); color: var(--color-text-primary); }
+.storybook-row { display: flex; align-items: center; flex-wrap: wrap; gap: 1rem; }
+.storybook-stack { display: grid; gap: 1rem; }
+.storybook-label { color: var(--color-text-muted); font: 500 var(--font-size-label) var(--font-family-mono); letter-spacing: .08em; text-transform: uppercase; }
+.button { display: inline-flex; align-items: center; justify-content: center; gap: var(--component-button-gap); border: 1px solid transparent; border-radius: var(--component-button-radius); padding: var(--component-button-padding-block) var(--component-button-padding-inline); font: 600 var(--component-button-font-size) var(--font-family-body); cursor: pointer; }
+.button-primary { background: var(--component-button-primary-background); color: var(--component-button-primary-foreground); }
+.button-primary:hover { background: var(--component-button-primary-hover); }
+.button-secondary { background: var(--component-button-secondary-background); color: var(--component-button-secondary-foreground); border-color: var(--color-border); }
+.button:focus-visible { outline: 3px solid var(--component-focus-ring); outline-offset: 2px; }
+.card { padding: var(--component-card-padding); background: var(--component-card-background); border: 1px solid var(--component-card-border); border-radius: var(--component-card-radius); box-shadow: var(--component-card-shadow); }
+.svg-markup { display: inline-flex; align-items: center; justify-content: center; }
+.svg-markup svg { display: block; width: 2.75rem; height: 2.75rem; }
+.storybook-avatar .avatar { display: inline-grid; width: 3rem; height: 3rem; border-radius: 50%; place-items: center; }
+.storybook-avatar .avatar-face { width: 100%; height: 100%; }

@@ -1,0 +1,68 @@
+:root {
+  /* Primitive palette: raw values only. Replace this palette to reskin the app. */
+  --primitive-color-white: #fffdf8;
+  --primitive-color-cream-50: #fffdf8;
+  --primitive-color-cream-100: #f7f0e7;
+  --primitive-color-blush-50: #fbf2f5;
+  --primitive-color-blush-100: #f4e8f0;
+  --primitive-color-blush-200: #e6dce7;
+  --primitive-color-lavender-100: #f3e8f4;
+  --primitive-color-lavender-200: #e6d9ea;
+  --primitive-color-plum-950: #2b2230;
+  --primitive-color-plum-800: #423047;
+  --primitive-color-plum-700: #49364f;
+  --primitive-color-plum-500: #6a5667;
+  --primitive-color-plum-300: #c8afcd;
+  --primitive-color-gray-700: #77717e;
+  --primitive-color-gray-500: #918995;
+  --primitive-color-green-700: #557d4a;
+  --primitive-color-green-600: #648769;
+  --primitive-color-green-100: #e8f2c9;
+  --primitive-color-lime-400: #b8d850;
+  --primitive-color-purple-500: #a489b5;
+  --primitive-color-orange-500: #ee815c;
+  --primitive-color-blue-400: #82adca;
+  --primitive-color-yellow-400: #efc84e;
+  --primitive-color-red-400: #e38e91;
+  --primitive-color-gray-300: #a6aaa7;
+  --primitive-color-black-700: #555b57;
+
+  /* Grade colors are primitives so routes and charts share exact values. */
+  --primitive-grade-green: #99bd67;
+  --primitive-grade-yellow: #efc84e;
+  --primitive-grade-blue: #82adca;
+  --primitive-grade-red: #e38e91;
+  --primitive-grade-gray: #a6aaa7;
+  --primitive-grade-black: #555b57;
+  --primitive-grade-purple: #a489b5;
+
+  --primitive-font-sans: 'DM Sans', sans-serif;
+  --primitive-font-display: 'Space Grotesk', sans-serif;
+  --primitive-font-mono: 'DM Mono', monospace;
+  --primitive-font-size-2xs: 0.5625rem;
+  --primitive-font-size-xs: 0.625rem;
+  --primitive-font-size-sm: 0.75rem;
+  --primitive-font-size-md: 0.875rem;
+  --primitive-font-size-lg: 1rem;
+  --primitive-font-size-xl: 1.25rem;
+  --primitive-font-size-2xl: 1.5rem;
+  --primitive-font-size-3xl: 2rem;
+
+  --primitive-space-0: 0;
+  --primitive-space-1: 0.25rem;
+  --primitive-space-2: 0.5rem;
+  --primitive-space-3: 0.75rem;
+  --primitive-space-4: 1rem;
+  --primitive-space-5: 1.25rem;
+  --primitive-space-6: 1.5rem;
+  --primitive-space-8: 2rem;
+  --primitive-space-10: 2.5rem;
+  --primitive-space-12: 3rem;
+
+  --primitive-radius-sm: 0.375rem;
+  --primitive-radius-md: 0.625rem;
+  --primitive-radius-lg: 0.875rem;
+  --primitive-radius-pill: 999px;
+  --primitive-shadow-soft: 3px 3px 0 rgb(73 54 79 / 9%);
+  --primitive-shadow-raised: 0 8px 24px rgb(43 34 48 / 12%);
+}

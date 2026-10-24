@@ -1,0 +1,69 @@
+:root,
+:root[data-palette='crux'] {
+  --color-canvas: var(--primitive-color-blush-50);
+  --color-surface: var(--primitive-color-cream-50);
+  --color-surface-subtle: var(--primitive-color-blush-100);
+  --color-surface-accent: var(--primitive-color-lime-100);
+  --color-text-primary: var(--primitive-color-plum-950);
+  --color-text-secondary: var(--primitive-color-gray-700);
+  --color-text-muted: var(--primitive-color-gray-500);
+  --color-border: var(--primitive-color-blush-200);
+  --color-outline: var(--primitive-color-plum-500);
+  --color-action-primary: var(--primitive-color-plum-800);
+  --color-action-primary-hover: var(--primitive-color-plum-700);
+  --color-action-secondary: var(--primitive-color-green-700);
+  --color-highlight: var(--primitive-color-green-600);
+  --color-highlight-soft: var(--primitive-color-lavender-100);
+  --color-highlight-strong: var(--primitive-color-orange-500);
+  --color-grade-green: var(--primitive-grade-green);
+  --color-grade-yellow: var(--primitive-grade-yellow);
+  --color-grade-blue: var(--primitive-grade-blue);
+  --color-grade-red: var(--primitive-grade-red);
+  --color-grade-gray: var(--primitive-grade-gray);
+  --color-grade-black: var(--primitive-grade-black);
+  --color-grade-purple: var(--primitive-grade-purple);
+  --font-family-body: var(--primitive-font-sans);
+  --font-family-display: var(--primitive-font-display);
+  --font-family-mono: var(--primitive-font-mono);
+  --font-size-caption: var(--primitive-font-size-2xs);
+  --font-size-label: var(--primitive-font-size-xs);
+  --font-size-body-sm: 0.8125rem;
+  --font-size-body: var(--primitive-font-size-md);
+  --font-size-heading-sm: var(--primitive-font-size-xl);
+  --font-size-heading: var(--primitive-font-size-2xl);
+  --font-size-display: var(--primitive-font-size-3xl);
+  --font-size-hero: 2.125rem;
+  --font-size-page-title: 2rem;
+  --space-control-gap: var(--primitive-space-2);
+  --space-card-inset: var(--primitive-space-4);
+  --space-section-gap: var(--primitive-space-6);
+  --space-page-inset: var(--primitive-space-8);
+  --space-main-inset: 2.9375rem;
+  --space-sidebar-top: 1.6875rem;
+  --space-sidebar-inline: 1.0625rem;
+  --space-sidebar-bottom: 1.125rem;
+  --radius-control: var(--primitive-radius-sm);
+  --radius-card: var(--primitive-radius-md);
+  --radius-dialog: var(--primitive-radius-lg);
+  --shadow-card: var(--primitive-shadow-soft);
+  --shadow-dialog: var(--primitive-shadow-raised);
+}
+
+/* Alternate palette for quick visual exploration; grade colors stay recognizable. */
+:root[data-palette='summit'] {
+  --color-canvas: #eef5f7;
+  --color-surface: #fffefa;
+  --color-surface-subtle: #e3eef2;
+  --color-surface-accent: #fff0ca;
+  --color-text-primary: #20333e;
+  --color-text-secondary: #5e737e;
+  --color-text-muted: #82959e;
+  --color-border: #d3e1e7;
+  --color-outline: #405967;
+  --color-action-primary: #315c70;
+  --color-action-primary-hover: #254a5c;
+  --color-action-secondary: #517b50;
+  --color-highlight: #517b50;
+  --color-highlight-soft: #e6eff4;
+  --color-highlight-strong: #e47755;
+}

@@ -1,0 +1,94 @@
+import { Meta, Canvas } from '@storybook/addon-docs/blocks';
+import * as ButtonStories from './components/Button.stories.jsx';
+import * as SurfaceStories from './components/Surface.stories.jsx';
+import * as TokenStories from './tokens/Tokens.stories.jsx';
+import * as IllustrationStories from './illustrations/Illustrations.stories.jsx';
+
+<Meta title="Design System/Introduction" />
+
+# Crux design system
+
+The shared visual language and reusable UI pieces for Crux Club. This guide is part of the design-system package, and the examples below render the same stories used to review the components and tokens.
+
+Use the **Palette** control in the Storybook toolbar to switch between the Crux and Summit semantic palettes. The component names and semantic roles stay the same when the palette changes.
+
+## Design principles
+
+- **Community first:** friendly, clear interfaces for a shared climbing log.
+- **Playful but readable:** expressive illustrations and warm colors sit beside simple layouts and clear type.
+- **Consistent by tokens:** components consume semantic and component tokens instead of embedding palette values.
+- **Easy to reskin:** change the primitive palette or select another semantic palette without rewriting components.
+
+## Token layers
+
+The tokens are defined in `src/tokens/`. Each layer answers a different question:
+
+| Layer | Purpose | Examples |
+| --- | --- | --- |
+| Primitives | Which raw values are available? | `--primitive-color-plum-800`, `--primitive-space-4`, `--primitive-font-size-md` |
+| Semantic | What role does a value play in the interface? | `--color-surface`, `--color-text-primary`, `--space-card-inset` |
+| Component | How does a reusable component apply those roles? | `--component-button-primary-background`, `--component-card-radius` |
+
+Prefer a semantic token in app and component styles. Change a palette by remapping semantic roles in `semantic.css`; reserve primitive values for palette definitions and token previews. Add component tokens when a shared component needs a stable, independently tunable value.
+
+### Color palette
+
+Grade colors are shared across holds, filters, charts, and problem labels. Crux is the default palette; Summit is an alternate semantic mapping for quick comparison. Grade colors retain their meaning across both palettes.
+
+<Canvas of={TokenStories.ColorPalette} />
+
+### Type scale
+
+Use the semantic type roles for interface text and the primitive type scale when defining or extending the roles.
+
+<Canvas of={TokenStories.TypeScale} />
+
+### Spacing scale
+
+Primitive spacing uses a four-pixel base step. Semantic spacing names express intent, such as a card inset or section gap; component tokens can tune a reusable component without changing the scale.
+
+<Canvas of={TokenStories.SpacingScale} />
+
+## Shared components
+
+Keep reusable controls and surfaces in `src/components/`. App-specific composition and page behavior belong in `apps/boulder-app`.
+
+### Buttons
+
+Use the primary variant for the main action in a view and secondary for supporting actions. Supply an icon through the `icon` prop so it remains decorative to assistive technology.
+
+<Canvas of={ButtonStories.ButtonSet} />
+
+### Surfaces
+
+Use `Surface` to provide a semantic section or article with the shared card treatment. Pass a different `as` element when the content structure calls for it.
+
+<Canvas of={SurfaceStories.WithHeading} />
+
+## Climbing illustrations
+
+Grade holds, boulder routes, climber avatars, and crew artwork live in `src/illustrations/`. Use these components and generators instead of recreating the same drawing inside a page.
+
+<Canvas of={IllustrationStories.GradeHolds} />
+
+## Use the package in the app
+
+```jsx
+import { Button, Surface } from '@crux/design-system';
+import '@crux/design-system/tokens.css';
+
+<Surface>
+  <h2>Today’s sends</h2>
+  <Button variant="primary">Log a send</Button>
+</Surface>
+```
+
+The app sets `data-palette="crux"` on its root element. Change it to `summit` to preview the alternate palette. Keep page-specific layout and behavior in the app; put reusable visual patterns, tokens, and illustrations in this package.
+
+## Extend the system
+
+1. Add raw values only to the primitive layer.
+2. Map each palette to the same semantic roles.
+3. Add a component token when a reusable control needs a named override.
+4. Add or update a Storybook story beside the component or token it documents.
+5. Check the component in both palette modes and at narrow and wide sizes before using it across app pages.

@@ -1,0 +1,34 @@
+:root {
+  --component-button-primary-background: var(--color-action-primary);
+  --component-button-primary-foreground: var(--primitive-color-white);
+  --component-button-primary-hover: var(--color-action-primary-hover);
+  --component-button-secondary-background: var(--color-surface-subtle);
+  --component-button-secondary-foreground: var(--color-text-secondary);
+  --component-card-background: var(--color-surface);
+  --component-card-border: var(--color-border);
+  --component-card-radius: var(--radius-card);
+  --component-card-shadow: var(--shadow-card);
+  --component-navigation-background: var(--color-surface-subtle);
+  --component-navigation-active-background: var(--color-highlight-soft);
+  --component-navigation-active-foreground: var(--color-action-primary);
+  --component-input-background: var(--color-surface);
+  --component-input-border: var(--color-border);
+  --component-focus-ring: var(--color-outline);
+  --component-icon-outline: var(--color-outline);
+  --component-dialog-radius: var(--radius-dialog);
+  --component-button-font-size: var(--primitive-font-size-sm);
+  --component-card-padding: var(--space-card-inset);
+  --component-card-gap: var(--space-section-gap);
+  --component-problem-card-padding: 0.9375rem;
+  --component-stat-card-padding-block: 0.9375rem;
+  --component-stat-card-padding-inline: 1.0625rem;
+  --component-content-card-padding-block: 1.1875rem;
+  --component-content-card-padding-inline: 1.25rem;
+  --component-button-padding-block: 0.625rem;
+  --component-button-padding-inline: 0.9375rem;
+  --component-button-gap: 0.4375rem;
+  --component-button-radius: var(--primitive-radius-sm);
+  --component-control-height: 2.5rem;
+  --component-icon-size: 1.5rem;
+  --component-avatar-size: 2rem;
+}
