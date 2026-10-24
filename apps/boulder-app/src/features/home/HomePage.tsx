@@ -14,6 +14,10 @@ import { MonthlyPodium } from './MonthlyPodium';
 const Hero = styled.div`display:flex;justify-content:space-between;align-items:flex-start;flex-direction:column;gap:20px;margin:10px 0 27px;@media ${mediaQueries.md}{align-items:flex-end;flex-direction:row}`;
 const ActionRow = styled.div`display:flex;gap:8px;flex-wrap:wrap;`;
 const StatCard = styled(Surface)`position:relative;min-height:100px;padding:14px 16px;display:grid;align-content:space-between;gap:10px;overflow:hidden;&:after{content:'✳';position:absolute;right:12px;top:3px;color:var(--color-highlight-strong);opacity:.2;font-size:30px} ${StatValue}{font-size:24px}`;
+const StatsGrid = styled.div`
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:${({theme})=>theme.space.md};
+  @media ${mediaQueries.md}{grid-template-columns:repeat(4,minmax(0,1fr));}
+`;
 const StatFooter = styled.div`display:flex;align-items:center;gap:9px;color:var(--color-highlight);font-size:12px;font-weight:600;`;
 const ContentGrid = styled.div`display:grid;grid-template-columns:minmax(0,1fr);gap:18px;margin-top:18px;@media ${mediaQueries.lg}{grid-template-columns:minmax(0,1.55fr) minmax(280px,.85fr)}`;
 const Stack = styled.div`display:grid;gap:18px;min-width:0;`;
@@ -37,12 +41,12 @@ export function HomePage({ data, sends, members, onLogSend, onScan, onNavigate, 
     <Hero><div><Eyebrow>Same wall, different ways up</Eyebrow><PageTitle>Welcome to <span>{data.crew.name}</span></PageTitle><PageDescription>A little progress is still progress. Let’s celebrate it together.</PageDescription></div>
       <ActionRow><Button $variant="secondary" onClick={onScan}><Icon name="scan"/> Scan route</Button><Button onClick={onLogSend}><Icon name="add"/> Log a send</Button></ActionRow></Hero>
     <MonthlyPodium standings={leaderboard.slice(0,3)} monthName={monthName} onViewProfile={onViewProfile}/>
-    <Grid $min="195px" $gap="14px">
+    <StatsGrid>
       <StatCard><StatLabel>TOTAL CREW SENDS</StatLabel><StatValue>{sends.length}</StatValue><StatFooter><Icon name="send" size={15}/>{monthSends.length} this month</StatFooter></StatCard>
       <StatCard><StatLabel>MEMBERS IN THE CREW</StatLabel><StatValue>{data.crew.memberIds.length}</StatValue><StatFooter><Icon name="crew" size={15}/>One wall, lots of beta</StatFooter></StatCard>
       <StatCard><StatLabel>HARDEST SEND · {monthName.toUpperCase()}</StatLabel><StatValue>{hardest??'—'}</StatValue><StatFooter>{hardest?<GradePill grade={hardest} compact/>:'Your next send could set it'}</StatFooter></StatCard>
       <StatCard><StatLabel>MONTHLY LEADER</StatLabel><StatValue>{leaderboard[0]?.member.name??'—'}</StatValue><StatFooter><Icon name="trophy" size={15}/>{leaderboard[0]?.points??0} points so far</StatFooter></StatCard>
-    </Grid>
+    </StatsGrid>
     <ContentGrid><Stack>
       <ProgressAnalytics sends={sends} members={members} range={range} onRange={setRange} selectedGrade={grade} onGrade={setGrade} memberFilter={memberFilter} onMemberFilter={setMemberFilter}/>
       <HighestLevelChart sends={memberFilter==='all'?sends:sends.filter((send)=>send.memberId===memberFilter)} range={range}/>
