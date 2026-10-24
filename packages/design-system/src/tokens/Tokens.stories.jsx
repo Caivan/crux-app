@@ -1,3 +1,5 @@
+import { breakpoints, mediaQueries } from './breakpoints.js';
+
 const meta = { title: 'Foundations/Design Tokens', tags: ['autodocs'] };
 export default meta;
 
@@ -19,4 +21,16 @@ export const TypeScale = {
 
 export const SpacingScale = {
   render: () => <div className="storybook-stack">{['1', '2', '3', '4', '5', '6', '8', '10', '12'].map((step) => <div key={step} className="storybook-row"><span className="storybook-label" style={{ width: 110 }}>space {step}</span><div style={{ height: 18, width: `var(--primitive-space-${step})`, minWidth: 1, background: 'var(--color-highlight)', borderRadius: 3 }} /><code>var(--primitive-space-{step})</code></div>)}</div>,
+};
+
+export const Breakpoints = {
+  render: () => <div className="storybook-stack">
+    <p>Use the ascending screen-width tokens with their matching <code>min-width</code> media queries. Start with the narrow layout, then add styles as the viewport grows.</p>
+    {Object.entries(breakpoints).map(([name, value]) => <div className="storybook-row" key={name}>
+      <span className="storybook-label" style={{ width: 90 }}>{name}</span>
+      <code>--screen-{name}: {value}</code>
+      <code>--mq-{name}: {mediaQueries[name]}</code>
+      <div aria-hidden="true" style={{ height: 8, width: `min(${value}, 100%)`, background: 'var(--color-highlight)', borderRadius: 4 }} />
+    </div>)}
+  </div>,
 };

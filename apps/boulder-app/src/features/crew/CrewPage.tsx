@@ -1,4 +1,5 @@
 import { Avatar, HoldIcon } from '@crux/design-system';
+import { mediaQueries } from '@crux/design-system/breakpoints';
 import type { CruxData, Member, Send } from '@crux/shared-types';
 import styled from 'styled-components';
 import { monthlyLeaderboard } from '../../domain/analytics';
@@ -6,7 +7,7 @@ import { GRADE_COLORS, GRADES } from '../../domain/catalog';
 import { Icon } from '../../components/Icons';
 import { Button, Eyebrow, PageDescription, PageTitle, Pill, Row, Surface } from '../../components/ui';
 
-const Header=styled.div`display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin:10px 0 24px;@media(max-width:560px){align-items:flex-start;flex-direction:column}`;
+const Header=styled.div`display:flex;justify-content:space-between;align-items:flex-start;flex-direction:column;gap:16px;margin:10px 0 24px;@media ${mediaQueries.md}{align-items:flex-end;flex-direction:row}`;
 const TableWrap=styled(Surface)`padding:0;overflow:hidden;`;
 const Scroll=styled.div`overflow:auto;`;
 const Table=styled.table`width:100%;min-width:760px;border-collapse:collapse;text-align:left;thead{background:var(--color-surface-subtle)}th{padding:13px 12px;color:var(--color-text-muted);font:500 10px var(--font-family-mono);letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}td{padding:13px 12px;border-top:1px solid var(--color-border);font-size:12px}.grade-head{text-align:center}.grade-head span{display:grid;justify-items:center;gap:3px}.grade-head .hold-icon{width:32px;height:29px}.num{text-align:center;font:600 13px var(--font-family-mono)}.member-button{display:flex;align-items:center;gap:10px;border:0;background:transparent;text-align:left;cursor:pointer}.member-name{display:block;font-weight:700}.member-role{display:block;color:var(--color-text-muted);font-size:11px}.points{font:700 16px var(--font-family-display)}`;

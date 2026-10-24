@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { createCruxBackend } from '@crux/backend-services';
+import { mediaQueries } from '@crux/design-system/breakpoints';
 import type { AppSection, CruxData, GradeDisplay, Problem, Send } from '@crux/shared-types';
 import { AppShell } from './components/AppShell';
 import { Button } from './components/ui';
@@ -19,7 +20,7 @@ import { cruxTheme } from './styles/theme';
 import styled, { ThemeProvider } from 'styled-components';
 
 type Dialog = { type:'send'; problem:Problem|null; edit:Send|null } | { type:'scan' } | { type:'invite' } | null;
-const DemoBanner=styled.div`display:flex;justify-content:space-between;align-items:center;gap:12px;margin:-14px 0 20px;padding:9px 12px;border-radius:12px;background:#f4edcd;color:#6a5625;font-size:11px;.copy{color:#776d55}@media(max-width:500px){align-items:flex-start;flex-direction:column}`;
+const DemoBanner=styled.div`display:flex;justify-content:space-between;align-items:flex-start;flex-direction:column;gap:12px;margin:-14px 0 20px;padding:9px 12px;border-radius:12px;background:#f4edcd;color:#6a5625;font-size:11px;.copy{color:#776d55}@media ${mediaQueries.md}{align-items:center;flex-direction:row}`;
 const Toast=styled.div`position:fixed;z-index:40;bottom:88px;left:50%;transform:translateX(-50%);padding:11px 17px;border-radius:12px;background:var(--color-action-primary);color:white;box-shadow:var(--shadow-dialog);font-weight:700;`;
 
 function loadData():CruxData{
