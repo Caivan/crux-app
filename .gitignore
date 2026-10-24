@@ -1,0 +1,12 @@
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+**/storybook-static/
+**/debug-storybook.log
+.turbo/
+.pnp.*
+.yarn/cache/
+.yarn/install-state.gz
+package-lock.json
+.DS_Store

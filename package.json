@@ -1,0 +1,19 @@
+{
+  "name": "crux-club",
+  "private": true,
+  "packageManager": "yarn@4.9.2",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo dev --filter=@crux/boulder-app",
+    "storybook": "yarn workspace @crux/design-system storybook",
+    "build-storybook": "yarn workspace @crux/design-system build-storybook",
+    "build": "turbo build",
+    "clean": "turbo clean"
+  },
+  "devDependencies": {
+    "turbo": "^2.5.8"
+  }
+}
