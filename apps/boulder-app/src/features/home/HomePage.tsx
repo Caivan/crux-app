@@ -1,4 +1,5 @@
 import { mediaQueries } from '@crux/design-system/breakpoints';
+import { Avatar } from '@crux/design-system';
 import type { AppSection, CruxData, Grade, Member, Send, TimeRange } from '@crux/shared-types';
 import { useMemo, useState } from 'react';
 import styled from 'styled-components';
@@ -25,13 +26,22 @@ const ActivityRow = styled.div`display:grid;grid-template-columns:42px minmax(0,
 const SectionHeader = styled.div`display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:9px;`;
 const TextLink = styled.button`padding:5px 0;border:0;color:var(--color-action-secondary);background:transparent;font-weight:700;cursor:pointer;`;
 const GradeLegend = styled.div`display:flex;gap:7px;flex-wrap:wrap;margin-top:12px;`;
+const Leaderboard = styled(Surface)`display:grid;gap:8px;margin-top:14px;padding:12px 16px;`;
+const LeaderboardRow = styled.button`
+  display:flex;align-items:center;gap:10px;width:100%;min-width:0;padding:6px 0;border:0;background:transparent;text-align:left;cursor:pointer;
+  .avatar{display:grid;place-items:center;flex:0 0 38px;width:38px;height:38px;border-radius:50%;overflow:hidden;background:var(--color-surface-subtle)}
+  .svg-markup{display:block;width:38px;height:38px}
+  .name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:700;color:var(--color-text-primary)}
+  .points{flex:0 0 auto;color:var(--color-highlight-strong);font:700 14px var(--font-family-display)}
+  &:focus-visible{outline:3px solid var(--color-outline);outline-offset:2px;border-radius:8px}
+`;
 
 export function HomePage({ data, sends, members, onLogSend, onScan, onNavigate, onViewProfile }: {
   data:CruxData; sends:Send[]; members:Member[]; onLogSend:()=>void; onScan:()=>void; onNavigate:(section:AppSection)=>void; onViewProfile:(id:string)=>void;
 }) {
   const [range,setRange]=useState<TimeRange>('week');const [grade,setGrade]=useState<Grade|'all'>('all');const [memberFilter,setMemberFilter]=useState('all');
   const monthSends=useMemo(()=>currentMonthSends(sends),[sends]);
-  const leaderboard=useMemo(()=>monthlyLeaderboard(members,sends).slice(0,5),[members,sends]);
+  const leaderboard=useMemo(()=>monthlyLeaderboard(members,sends),[members,sends]);
   const hardest=monthSends.reduce<Grade|null>((hardest,send)=>!hardest||GRADES.findIndex((item)=>item.grade===send.grade)>GRADES.findIndex((item)=>item.grade===hardest)?send.grade:hardest,null);
   const latest=useMemo(()=>[...sends].sort((a,b)=>b.loggedAt.localeCompare(a.loggedAt)).slice(0,5),[sends]);
   const monthName=new Date().toLocaleDateString('en-US',{month:'long',year:'numeric'});
@@ -41,6 +51,7 @@ export function HomePage({ data, sends, members, onLogSend, onScan, onNavigate, 
     <Hero><div><Eyebrow>Same wall, different ways up</Eyebrow><PageTitle>Welcome to <span>{data.crew.name}</span></PageTitle><PageDescription>A little progress is still progress. Let’s celebrate it together.</PageDescription></div>
       <ActionRow><Button $variant="secondary" onClick={onScan}><Icon name="scan"/> Scan route</Button><Button onClick={onLogSend}><Icon name="add"/> Log a send</Button></ActionRow></Hero>
     <MonthlyPodium standings={leaderboard.slice(0,3)} monthName={monthName} onViewProfile={onViewProfile}/>
+    <Leaderboard aria-label="Monthly leaderboard">{leaderboard.map(({member,points})=><LeaderboardRow key={member.id} type="button" onClick={()=>onViewProfile(member.id)} aria-label={`${member.name}, ${points} points`}><span className="avatar"><Avatar person={member}/></span><span className="name">{member.name}</span><span className="points">{points} pts</span></LeaderboardRow>)}</Leaderboard>
     <StatsGrid>
       <StatCard><StatLabel>TOTAL CREW SENDS</StatLabel><StatValue>{sends.length}</StatValue><StatFooter><Icon name="send" size={15}/>{monthSends.length} this month</StatFooter></StatCard>
       <StatCard><StatLabel>MEMBERS IN THE CREW</StatLabel><StatValue>{data.crew.memberIds.length}</StatValue><StatFooter><Icon name="crew" size={15}/>One wall, lots of beta</StatFooter></StatCard>
