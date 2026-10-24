@@ -1,11 +1,21 @@
 import { HoldIcon } from '@crux/design-system';
 import type { AttemptCategory, CruxData, Grade, GradeDisplay, Problem, Send } from '@crux/shared-types';
 import { useMemo, useState } from 'react';
-import { ATTEMPTS, GRADE_COLORS, GRADES, gradeLabel, pointsForSend } from '../../domain/catalog';
+import styled from 'styled-components';
+import { GRADE_COLORS, gradeLabel, pointsForSend } from '../../domain/catalog';
 import { localDateString } from '../../domain/date';
 import { Icon } from '../../components/Icons';
 import { Button, Eyebrow, Field, Input, ModalBackdrop, ModalCard, Row, SectionTitle, Select, Stack } from '../../components/ui';
 import { ClimberPicker } from './ClimberPicker';
+import { GradePicker } from './GradePicker';
+import { AttemptPicker } from './AttemptPicker';
+
+const DialogFooter=styled(Row)`
+  position:sticky;bottom:calc(-1 * clamp(20px,4vw,34px));z-index:2;justify-content:flex-end;
+  margin:18px calc(-1 * clamp(20px,4vw,34px)) calc(-1 * clamp(20px,4vw,34px));
+  padding:12px clamp(20px,4vw,34px) clamp(20px,4vw,34px);
+  border-top:1px solid var(--color-border);background:var(--color-surface);
+`;
 
 export interface SendDraft { memberId:string; problemId:string|null; grade:Grade; attempt:AttemptCategory; date:string; }
 
@@ -29,12 +39,12 @@ export function SendDialog({ data, sends, edit, problem, gradeDisplay, onClose, 
       {mode==='problem'?<Field>Problem from the catalog
         <Select required value={problemId} onChange={(event)=>{setProblemId(event.target.value);const next=data.problems.find((item)=>item.id===event.target.value);if(next)setGrade(next.grade)}}><option value="" disabled>Select a problem</option>{[...data.problems].sort((a,b)=>b.createdAt.localeCompare(a.createdAt)).map((item)=><option key={item.id} value={item.id}>{item.name} · {gradeLabel(item.grade,gradeDisplay)} · {new Date(`${item.createdAt}T12:00:00`).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</option>)}</Select>
         {selected&&<div style={{display:'flex',alignItems:'center',gap:9,padding:'8px 10px',borderRadius:10,background:'var(--color-surface-subtle)'}}><HoldIcon grade={selected.grade}/><b>{selected.name}</b><span style={{color:GRADE_COLORS[selected.grade],marginLeft:'auto'}}>{gradeLabel(selected.grade,gradeDisplay)}</span></div>}
-      </Field>:<Field>Level completed<Select value={grade} onChange={(event)=>setGrade(event.target.value as Grade)}>{GRADES.map(({grade:level})=><option key={level} value={level}>{gradeLabel(level,gradeDisplay)} · {level} · {GRADES.find((item)=>item.grade===level)?.points} pts</option>)}</Select></Field>}
-      <Field>How many tries?<Select value={attempt} onChange={(event)=>setAttempt(event.target.value as AttemptCategory)}>{ATTEMPTS.map((item)=><option key={item.id} value={item.id}>{item.label} · {item.multiplier}×</option>)}</Select></Field>
+      </Field>:<Field as="div">Level completed<GradePicker value={grade} onChange={setGrade}/></Field>}
+      <Field as="div">How many tries?<AttemptPicker value={attempt} onChange={setAttempt}/></Field>
       <Field>Send date{edit?<Input value={date} readOnly aria-readonly="true"/>:<Input required type="date" max={localDateString()} value={date} onChange={(event)=>setDate(event.target.value)}/>}</Field>
     </Stack>
     <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:12,padding:'13px 14px',marginTop:16,borderRadius:13,background:'var(--color-highlight-soft)'}}><span><b style={{display:'block'}}>Points earned</b><small style={{color:'var(--color-text-muted)'}}>{pointsForSend(mode==='problem'&&selected?selected.grade:grade,attempt)} base{mode==='problem'&&firstSend?' + 5 Risk Taker':''}</small></span><strong style={{font:'700 24px var(--font-family-display)'}}>{points} pts</strong></div>
     {mode==='problem'&&firstSend&&selected&&<p style={{margin:'8px 0',color:'var(--color-text-muted)',fontSize:11}}>Be first on this shared problem to earn Risk Taker. The bonus moves to the next earliest send if this one is removed.</p>}
-    <Row style={{justifyContent:'flex-end',marginTop:18}}><Button type="button" $variant="secondary" onClick={onClose}>Cancel</Button><Button type="submit" disabled={mode==='problem'&&!problemId}>{edit?'Save changes':'Log send'}<Icon name="send" size={16}/></Button></Row>
+    <DialogFooter><Button type="button" $variant="secondary" onClick={onClose}>Cancel</Button><Button type="submit" disabled={mode==='problem'&&!problemId}>{edit?'Save changes':'Log send'}<Icon name="send" size={16}/></Button></DialogFooter>
   </ModalCard></ModalBackdrop>;
 }
