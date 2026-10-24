@@ -1,5 +1,5 @@
 import { Avatar, BoulderIcon } from '@crux/design-system';
-import { breakpoints } from '@crux/design-system/breakpoints';
+import { mediaQueries } from '@crux/design-system/breakpoints';
 import type { CruxData, Grade, GradeDisplay, Member, Problem, Send } from '@crux/shared-types';
 import { useMemo, useState } from 'react';
 import styled from 'styled-components';
@@ -9,8 +9,8 @@ import { GradePill } from '../../components/GradePill';
 import { Icon } from '../../components/Icons';
 import { Button, Eyebrow, Field, Grid, Input, PageDescription, PageTitle, Pill, Row, SectionTitle, Select, Surface } from '../../components/ui';
 
-const Header=styled.div`display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin:12px 0 23px;@media(max-width:${breakpoints.narrow}){align-items:flex-start;flex-direction:column}`;
-const Filters=styled(Surface)`display:grid;grid-template-columns:minmax(180px,1.4fr) repeat(3,minmax(130px,1fr));gap:12px;align-items:end;margin-bottom:16px;@media(max-width:${breakpoints.tablet}){grid-template-columns:repeat(2,minmax(0,1fr))}@media(max-width:${breakpoints.compact}){grid-template-columns:minmax(0,1fr)}`;
+const Header=styled.div`display:flex;align-items:flex-start;flex-direction:column;gap:16px;margin:12px 0 23px;@media ${mediaQueries.md}{align-items:flex-end;flex-direction:row}`;
+const Filters=styled(Surface)`display:grid;grid-template-columns:minmax(0,1fr);gap:12px;align-items:end;margin-bottom:16px;@media ${mediaQueries.md}{grid-template-columns:repeat(2,minmax(0,1fr))}@media ${mediaQueries.lg}{grid-template-columns:minmax(180px,1.4fr) repeat(3,minmax(130px,1fr))}`;
 const ProblemCard=styled(Surface)`display:grid;grid-template-columns:70px minmax(0,1fr);gap:13px;align-items:center;padding:15px;cursor:pointer;transition:transform .16s ease,box-shadow .16s ease;&:hover{transform:translateY(-2px);box-shadow:0 7px 0 #49374418}`;
 const Boulder=styled.div<{ $grade:Grade }>`display:grid;place-items:center;width:68px;height:68px;border-radius:17px;background:${({$grade})=>GRADE_TINTS[$grade]};.boulder-icon{width:48px;height:52px}`;
 const CardTitle=styled.h3`margin:7px 0 3px;font:700 16px var(--font-family-display);letter-spacing:-.02em;`;

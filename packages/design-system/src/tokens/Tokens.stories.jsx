@@ -1,4 +1,4 @@
-import { breakpoints } from './breakpoints.js';
+import { breakpoints, mediaQueries } from './breakpoints.js';
 
 const meta = { title: 'Foundations/Design Tokens', tags: ['autodocs'] };
 export default meta;
@@ -25,10 +25,11 @@ export const SpacingScale = {
 
 export const Breakpoints = {
   render: () => <div className="storybook-stack">
-    <p>Use these shared viewport widths in <code>max-width</code> media queries. Import <code>breakpoints</code> from <code>@crux/design-system/breakpoints</code>; CSS custom properties cannot be referenced directly inside media query conditions.</p>
+    <p>Use the ascending screen-width tokens with their matching <code>min-width</code> media queries. Start with the narrow layout, then add styles as the viewport grows.</p>
     {Object.entries(breakpoints).map(([name, value]) => <div className="storybook-row" key={name}>
       <span className="storybook-label" style={{ width: 90 }}>{name}</span>
-      <code>{value}</code>
+      <code>--screen-{name}: {value}</code>
+      <code>--mq-{name}: {mediaQueries[name]}</code>
       <div aria-hidden="true" style={{ height: 8, width: `min(${value}, 100%)`, background: 'var(--color-highlight)', borderRadius: 4 }} />
     </div>)}
   </div>,

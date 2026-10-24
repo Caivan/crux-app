@@ -1,5 +1,5 @@
 import { Avatar } from '@crux/design-system';
-import { breakpoints } from '@crux/design-system/breakpoints';
+import { mediaQueries } from '@crux/design-system/breakpoints';
 import type { Grade, GradeDisplay, Member, Problem, Send, TimeRange } from '@crux/shared-types';
 import styled from 'styled-components';
 import { gradeBreakdown } from '../../domain/analytics';
@@ -10,7 +10,7 @@ import { ProgressAnalytics, HighestLevelChart } from '../../components/ProgressA
 import { Icon } from '../../components/Icons';
 import { Button, Eyebrow, Grid, PageDescription, PageTitle, Pill, Row, SectionTitle, StatLabel, StatValue, Surface } from '../../components/ui';
 
-const Hero=styled(Surface)`display:flex;justify-content:space-between;align-items:center;gap:18px;margin-bottom:17px;background:linear-gradient(120deg,var(--color-surface) 62%,#eadcf088);@media(max-width:${breakpoints.narrow}){align-items:flex-start;flex-direction:column}`;
+const Hero=styled(Surface)`display:flex;justify-content:space-between;align-items:flex-start;flex-direction:column;gap:18px;margin-bottom:17px;background:linear-gradient(120deg,var(--color-surface) 62%,#eadcf088);@media ${mediaQueries.md}{align-items:center;flex-direction:row}`;
 const ProfileIdentity=styled.div`display:flex;align-items:center;gap:17px;.avatar{width:74px!important;height:74px!important}.avatar-face{width:100%;height:100%}`;
 const Stats=styled(Grid)`margin-bottom:17px;`;
 const GradeCard=styled(Surface)`padding:14px;display:grid;gap:8px;min-width:0;.bar{height:4px;border-radius:4px}`;
