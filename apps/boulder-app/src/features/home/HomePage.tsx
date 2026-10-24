@@ -15,8 +15,8 @@ const Hero = styled.div`display:flex;justify-content:space-between;align-items:f
 const ActionRow = styled.div`display:flex;gap:8px;flex-wrap:wrap;`;
 const StatCard = styled(Surface)`position:relative;min-height:100px;padding:14px 16px;display:grid;align-content:space-between;gap:10px;overflow:hidden;&:after{content:'✳';position:absolute;right:12px;top:3px;color:var(--color-highlight-strong);opacity:.2;font-size:30px} ${StatValue}{font-size:24px}`;
 const StatsGrid = styled.div`
-  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:${({theme})=>theme.space.md};
-  @media ${mediaQueries.md}{grid-template-columns:repeat(4,minmax(0,1fr));}
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:${({theme})=>theme.space.md};
+  @media ${mediaQueries.md}{gap:14px;}
 `;
 const StatFooter = styled.div`display:flex;align-items:center;gap:9px;color:var(--color-highlight);font-size:12px;font-weight:600;`;
 const ContentGrid = styled.div`display:grid;grid-template-columns:minmax(0,1fr);gap:18px;margin-top:18px;@media ${mediaQueries.lg}{grid-template-columns:minmax(0,1.55fr) minmax(280px,.85fr)}`;
