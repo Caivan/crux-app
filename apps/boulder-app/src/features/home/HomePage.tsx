@@ -45,7 +45,6 @@ export function HomePage({ data, sends, members, onLogSend, onScan, onNavigate, 
       <StatCard><StatLabel>TOTAL CREW SENDS</StatLabel><StatValue>{sends.length}</StatValue><StatFooter><Icon name="send" size={15}/>{monthSends.length} this month</StatFooter></StatCard>
       <StatCard><StatLabel>MEMBERS IN THE CREW</StatLabel><StatValue>{data.crew.memberIds.length}</StatValue><StatFooter><Icon name="crew" size={15}/>One wall, lots of beta</StatFooter></StatCard>
       <StatCard><StatLabel>HARDEST SEND · {monthName.toUpperCase()}</StatLabel><StatValue>{hardest??'—'}</StatValue><StatFooter>{hardest?<GradePill grade={hardest} compact/>:'Your next send could set it'}</StatFooter></StatCard>
-      <StatCard><StatLabel>MONTHLY LEADER</StatLabel><StatValue>{leaderboard[0]?.member.name??'—'}</StatValue><StatFooter><Icon name="trophy" size={15}/>{leaderboard[0]?.points??0} points so far</StatFooter></StatCard>
     </StatsGrid>
     <ContentGrid><Stack>
       <ProgressAnalytics sends={sends} members={members} range={range} onRange={setRange} selectedGrade={grade} onGrade={setGrade} memberFilter={memberFilter} onMemberFilter={setMemberFilter}/>
