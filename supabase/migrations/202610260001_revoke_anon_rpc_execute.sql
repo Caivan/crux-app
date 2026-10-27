@@ -1,0 +1,26 @@
+revoke execute on function public.create_crew_invitation(uuid) from public, anon;
+revoke execute on function public.accept_crew_invitation(text) from public, anon;
+revoke execute on function public.log_send(uuid, uuid, public.crux_grade, public.send_attempt, date, uuid) from public, anon;
+revoke execute on function public.edit_my_send(uuid, public.crux_grade, public.send_attempt) from public, anon;
+revoke execute on function public.delete_my_send(uuid) from public, anon;
+revoke execute on function public.leave_crew(uuid) from public, anon;
+revoke execute on function public.remove_crew_member(uuid, uuid) from public, anon;
+revoke execute on function public.delete_my_account() from public, anon;
+revoke execute on function public.is_crew_member(uuid) from public, anon;
+revoke execute on function public.is_crew_admin(uuid) from public, anon;
+grant execute on function public.is_crew_member(uuid) to authenticated;
+grant execute on function public.is_crew_admin(uuid) to authenticated;
+revoke execute on function public.create_profile_for_auth_user() from public, anon, authenticated;
+revoke execute on function public.keep_problems_anonymous() from public, anon, authenticated;
+revoke execute on function public.on_send_removed() from public, anon, authenticated;
+revoke execute on function public.recalculate_problem_award(uuid) from public, anon, authenticated;
+revoke execute on function public.points_for(public.crux_grade, public.send_attempt, boolean) from public, anon, authenticated;
+
+grant execute on function public.create_crew_invitation(uuid) to authenticated;
+grant execute on function public.accept_crew_invitation(text) to authenticated;
+grant execute on function public.log_send(uuid, uuid, public.crux_grade, public.send_attempt, date, uuid) to authenticated;
+grant execute on function public.edit_my_send(uuid, public.crux_grade, public.send_attempt) to authenticated;
+grant execute on function public.delete_my_send(uuid) to authenticated;
+grant execute on function public.leave_crew(uuid) to authenticated;
+grant execute on function public.remove_crew_member(uuid, uuid) to authenticated;
+grant execute on function public.delete_my_account() to authenticated;

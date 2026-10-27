@@ -54,7 +54,7 @@ export function HomePage({ data, sends, members, onLogSend, onScan, onNavigate, 
     <Leaderboard aria-label="Monthly leaderboard">{leaderboard.map(({member,points})=><LeaderboardRow key={member.id} type="button" onClick={()=>onViewProfile(member.id)} aria-label={`${member.name}, ${points} points`}><span className="avatar"><Avatar person={member}/></span><span className="name">{member.name}</span><span className="points">{points} pts</span></LeaderboardRow>)}</Leaderboard>
     <StatsGrid>
       <StatCard><StatLabel>TOTAL CREW SENDS</StatLabel><StatValue>{sends.length}</StatValue><StatFooter><Icon name="send" size={15}/>{monthSends.length} this month</StatFooter></StatCard>
-      <StatCard><StatLabel>MEMBERS IN THE CREW</StatLabel><StatValue>{data.crew.memberIds.length}</StatValue><StatFooter><Icon name="crew" size={15}/>One wall, lots of beta</StatFooter></StatCard>
+      <StatCard><StatLabel>MEMBERS IN THE CREW</StatLabel><StatValue>{data.crew.memberIds.length}</StatValue></StatCard>
       <StatCard><StatLabel>HARDEST SEND · {monthName.toUpperCase()}</StatLabel><StatValue>{hardest??'—'}</StatValue><StatFooter>{hardest?<GradePill grade={hardest} compact/>:'Your next send could set it'}</StatFooter></StatCard>
     </StatsGrid>
     <ContentGrid><Stack>

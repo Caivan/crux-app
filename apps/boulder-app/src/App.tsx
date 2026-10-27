@@ -19,7 +19,7 @@ import { GlobalStyle } from './styles/GlobalStyle';
 import { cruxTheme } from './styles/theme';
 import styled, { ThemeProvider } from 'styled-components';
 
-type Dialog = { type:'send'; problem:Problem|null; edit:Send|null } | { type:'scan' } | { type:'invite' } | null;
+type Dialog = { type:'send'; problem:Problem|null; edit:Send|null; lockProblem?:boolean } | { type:'scan' } | { type:'invite' } | null;
 const DemoBanner=styled.div`display:flex;justify-content:space-between;align-items:flex-start;flex-direction:column;gap:12px;margin:-14px 0 20px;padding:9px 12px;border-radius:12px;background:#f4edcd;color:#6a5625;font-size:11px;.copy{color:#776d55}@media ${mediaQueries.md}{align-items:center;flex-direction:row}`;
 const Toast=styled.div`position:fixed;z-index:40;bottom:88px;left:50%;transform:translateX(-50%);padding:11px 17px;border-radius:12px;background:var(--color-action-primary);color:white;box-shadow:var(--shadow-dialog);font-weight:700;`;
 
@@ -100,7 +100,7 @@ export default function App(){
     try{if(backend&&authState==='live'){await backend.sends.remove(send.id);await reloadLiveData()}else setData((current)=>({...current,sends:current.sends.filter((item)=>item.id!==send.id)}));notify('Send removed.')}catch(error){notify(error instanceof Error?error.message:'Could not delete the send.')}
   };
   const beginEdit=(send:Send)=>setDialog({type:'send',problem:null,edit:send});
-  const openExisting=(problem:Problem)=>{setDialog({type:'send',problem,edit:null});notify(`${problem.name} is already in the catalog.`)};
+  const openExisting=(problem:Problem)=>{setDialog({type:'send',problem,edit:null,lockProblem:true});notify(`${problem.name} is already in the catalog.`)};
   const signIn=async(token='')=>{if(!backend)return;try{if(token){const url=new URL(window.location.href);url.searchParams.set('invite',invitationToken(token));window.history.replaceState({},'',url)}await backend.auth.signInWithGoogle()}catch(error){setAuthError(error instanceof Error?error.message:'Google sign-in could not start.');setAuthState('error')}};
   const acceptInvite=async(token:string)=>{if(!backend||!authUserId)return;try{const inviteToken=invitationToken(token);await backend.auth.acceptInvitation(inviteToken);const url=new URL(window.location.href);url.searchParams.delete('invite');window.history.replaceState({},'',url);const snapshot=await backend.crew.current(authUserId);if(!snapshot)throw new Error('Invitation accepted, but the crew could not be loaded.');setData(snapshot);setAuthState('live')}catch(error){setAuthError(error instanceof Error?error.message:'Could not accept the invitation.');setAuthState('error')}};
   const signOut=async()=>{if(!backend)return;await backend.auth.signOut();setData(structuredClone(DEMO_DATA));setSection('home');setProfileId(null)};
@@ -112,10 +112,10 @@ export default function App(){
   return <ThemeProvider theme={cruxTheme}><GlobalStyle/><AppShell data={data} section={section} onNavigate={navigate} onInvite={()=>setDialog({type:'invite'})} onLogSend={logSend} onSignOut={authState==='live'?()=>void signOut():undefined} gradeDisplay={gradeDisplay} onGradeDisplay={setGradeDisplay}>
     <DemoBanner><b>{authState==='live'?'LIVE · PRIVATE CREW DATA':'DEMO MODE · saved on this device'}</b><span className="copy">{authState==='live'?'Amurados activity is available to crew members only.':'Connect Supabase to use Google sign-in and share Amurados data across devices.'}</span></DemoBanner>
     {section==='home'&&<HomePage data={data} sends={sends} members={data.members} onLogSend={logSend} onScan={()=>setDialog({type:'scan'})} onNavigate={navigate} onViewProfile={showProfile}/>}
-    {section==='problems'&&<ProblemsPage data={data} sends={sends} members={data.members} currentMemberId={data.currentMemberId} gradeDisplay={gradeDisplay} onScan={()=>setDialog({type:'scan'})} onManualSend={logSend} onLogProblemSend={(problem)=>setDialog({type:'send',problem,edit:null})}/>}
+    {section==='problems'&&<ProblemsPage data={data} sends={sends} members={data.members} currentMemberId={data.currentMemberId} gradeDisplay={gradeDisplay} onScan={()=>setDialog({type:'scan'})} onManualSend={logSend} onLogProblemSend={(problem)=>setDialog({type:'send',problem,edit:null,lockProblem:true})}/>}
     {section==='crew'&&<CrewPage data={data} members={data.members} sends={sends} onInvite={()=>setDialog({type:'invite'})} onViewProfile={showProfile} onRemoveMember={(id)=>void removeMember(id)} gradeDisplay={gradeDisplay}/>}
     {section==='profile'&&<ProfilePage member={profileMember} sends={sends} problems={data.problems} currentMemberId={data.currentMemberId} gradeDisplay={gradeDisplay} onEditSend={beginEdit} onDeleteSend={(send)=>void deleteSend(send)} onLogSend={logSend} onRange={setRange} range={range} selectedGrade={profileGrade} onGrade={setProfileGrade} canManageAccount={authState==='live'} onLeaveCrew={()=>void leaveCrew()} onDeleteAccount={()=>void deleteAccount()}/>}
-    {dialog?.type==='send'&&<SendDialog data={data} sends={sends} edit={dialog.edit} problem={dialog.problem} gradeDisplay={gradeDisplay} onClose={()=>setDialog(null)} onSave={createSend}/>}
+    {dialog?.type==='send'&&<SendDialog data={data} sends={sends} edit={dialog.edit} problem={dialog.problem} gradeDisplay={gradeDisplay} lockProblem={dialog.lockProblem} onClose={()=>setDialog(null)} onSave={createSend}/>}
     {dialog?.type==='scan'&&<RouteScanDialog problems={data.problems} members={data.members} currentMemberId={data.currentMemberId} onClose={()=>setDialog(null)} onExisting={openExisting} onCreate={saveScannedProblem}/>}
     {dialog?.type==='invite'&&<InviteDialog crewName={data.crew.name} onClose={()=>setDialog(null)} onCreateInvite={createInvite}/>}
     {toast&&<Toast role="status">{toast}<Button $variant="quiet" aria-label="Dismiss" onClick={()=>setToast('')} style={{marginLeft:8,color:'white'}}>×</Button></Toast>}

@@ -1,9 +1,9 @@
-import { Avatar, ChalkBagIcon } from '@crux/design-system';
+import { Avatar, BoulderIcon, ChalkBagIcon, CrewIcon } from '@crux/design-system';
 import { mediaQueries } from '@crux/design-system/breakpoints';
 import type { AppSection, CruxData } from '@crux/shared-types';
 import type { ReactNode } from 'react';
 import styled from 'styled-components';
-import { Icon, type IconName } from './Icons';
+import { Icon } from './Icons';
 import { Button, IconButton, Pill } from './ui';
 
 const Shell = styled.div`min-height: 100vh; display: grid; grid-template-columns: minmax(0,1fr); @media ${mediaQueries.lg}{grid-template-columns:242px minmax(0,1fr);}`;
@@ -22,6 +22,12 @@ const NavItem = styled.button<{ $active: boolean }>`
   color: ${({ $active }) => $active ? 'var(--color-action-primary)' : 'var(--color-text-secondary)'};
   background: ${({ $active }) => $active ? 'var(--color-highlight-soft)' : 'transparent'}; font-weight: ${({ $active }) => $active ? 700 : 600}; cursor: pointer;
   &:hover { background: var(--color-highlight-soft); }
+  .nav-icon { display:grid; width:20px; height:20px; flex:none; place-items:center; }
+  .nav-icon svg { display:block; width:100%; height:100%; }
+  .nav-icon .svg-markup { display:grid; width:100%; height:100%; place-items:center; }
+  .nav-icon .boulder-icon { width:20px; height:22px; }
+  .nav-icon .crew-icon { width:25px; height:22px; }
+  .nav-icon .avatar { width:20px; height:20px; font-size:7px; }
 `;
 const SidebarSpacer = styled.div`flex: 1;`;
 const MemberChip = styled.div`display: flex; align-items: center; gap: 10px; padding: 10px 7px; border-top: 1px solid var(--color-border);`;
@@ -31,10 +37,19 @@ const Breadcrumb = styled.div`min-width:0;overflow:hidden;color: var(--color-tex
 const Actions = styled.div`display:flex;flex:none;align-items:center;gap:5px;.invite-label{display:none}@media ${mediaQueries.md}{gap:10px;.invite-label{display:inline}}`;
 const DateLabel = styled.span`display:none;color:var(--color-text-muted);font-size:12px;@media ${mediaQueries.md}{display:inline}`;
 const MobileNav = styled.nav`position:fixed;z-index:10;left:10px;right:10px;bottom:9px;display:grid;grid-template-columns:repeat(4,1fr);padding:6px;border:1px solid var(--color-border);border-radius:18px;background:var(--color-surface);box-shadow:0 8px 28px #2b223026;@media ${mediaQueries.lg}{display:none;}`;
-const MobileItem = styled.button<{ $active:boolean }>`display:grid;gap:2px;justify-items:center;padding:7px 2px;border:0;border-radius:12px;color:${({$active})=>$active?'var(--color-action-primary)':'var(--color-text-muted)'};background:${({$active})=>$active?'var(--color-highlight-soft)':'transparent'};font-size:9px;font-weight:700;`;
-const navItems: { id: AppSection; label: string; icon: IconName }[] = [
-  { id: 'home', label: 'Crux Halle', icon: 'home' }, { id: 'problems', label: 'Problems', icon: 'problems' }, { id: 'crew', label: 'Your Crew', icon: 'crew' }, { id: 'profile', label: 'Profile', icon: 'profile' },
+const MobileItem = styled.button<{ $active:boolean }>`display:grid;gap:2px;justify-items:center;padding:7px 2px;border:0;border-radius:12px;color:${({$active})=>$active?'var(--color-action-primary)':'var(--color-text-muted)'};background:${({$active})=>$active?'var(--color-highlight-soft)':'transparent'};font-size:9px;font-weight:700;.nav-icon{display:grid;width:22px;height:22px;place-items:center}.nav-icon>svg{display:block;width:100%;height:100%}.nav-icon .svg-markup{display:grid;width:100%;height:100%;place-items:center}.nav-icon .boulder-icon{width:19px;height:21px}.nav-icon .crew-icon{width:23px;height:19px}.nav-icon .avatar{width:20px;height:20px;font-size:7px}`;
+const navItems: { id: AppSection; label: string }[] = [
+  { id: 'home', label: 'Crux Halle' }, { id: 'problems', label: 'Problems' }, { id: 'crew', label: 'Your Crew' }, { id: 'profile', label: 'Profile' },
 ];
+
+function NavigationIcon({ section, member }: { section: AppSection; member: CruxData['members'][number] }) {
+  switch (section) {
+    case 'home': return <ChalkBagIcon />;
+    case 'problems': return <BoulderIcon grade="Blue" />;
+    case 'crew': return <CrewIcon />;
+    case 'profile': return <Avatar person={member} className="nav-profile-avatar" />;
+  }
+}
 
 export function AppShell({ data, section, onNavigate, onInvite, onLogSend, onSignOut, gradeDisplay, onGradeDisplay, children }: { data: CruxData; section: AppSection; onNavigate: (section: AppSection) => void; onInvite: () => void; onLogSend: () => void; onSignOut?:()=>void; gradeDisplay:'color'|'fontainebleau'|'vscale'; onGradeDisplay:(value:'color'|'fontainebleau'|'vscale')=>void; children: ReactNode }) {
   const me = data.members.find((member) => member.id === data.currentMemberId)!;
@@ -42,10 +57,10 @@ export function AppShell({ data, section, onNavigate, onInvite, onLogSend, onSig
   return <Shell>
     <Sidebar><Brand><BrandMark>C</BrandMark> crux<span style={{color:'var(--color-highlight-strong)'}}>.</span></Brand>
       <HomeCard><HomeIcon><ChalkBagIcon/></HomeIcon><div><small style={{display:'block',font:'10px var(--font-family-mono)',color:'var(--color-text-muted)',letterSpacing:'.08em'}}>YOUR HOME GYM</small><strong>{data.crew.homeName}</strong><div><Pill $tone="green">{data.crew.name}</Pill></div></div></HomeCard>
-      <Nav aria-label="Main navigation">{navItems.map((item)=><NavItem key={item.id} type="button" $active={section===item.id} onClick={()=>onNavigate(item.id)} aria-current={section===item.id?'page':undefined}><Icon name={item.icon}/>{item.label}</NavItem>)}</Nav>
+      <Nav aria-label="Main navigation">{navItems.map((item)=><NavItem key={item.id} type="button" $active={section===item.id} onClick={()=>onNavigate(item.id)} aria-current={section===item.id?'page':undefined}><span className="nav-icon"><NavigationIcon section={item.id} member={me}/></span>{item.label}</NavItem>)}</Nav>
       <SidebarSpacer/><MemberChip><span className="avatar-wrap"><Avatar person={me}/></span><span><b style={{display:'block'}}>{me.name}</b><small style={{color:'var(--color-text-muted)'}}>{me.role==='admin'?'Crew admin':'Crew member'}</small></span></MemberChip>
     </Sidebar>
     <Main><Topbar><Breadcrumb>CRUX HALLE <span>/</span><b>{navItems.find((item)=>item.id===section)?.label}</b></Breadcrumb><Actions><DateLabel>{date}</DateLabel><select aria-label="Grade display system" value={gradeDisplay} onChange={(event)=>onGradeDisplay(event.target.value as 'color'|'fontainebleau'|'vscale')} style={{maxWidth:116,padding:'6px 8px',border:'1px solid var(--color-border)',borderRadius:9,background:'var(--color-surface)',color:'var(--color-text-secondary)',fontSize:10}}><option value="color">Crux colors</option><option value="fontainebleau">Font.</option><option value="vscale">V-scale</option></select>{me.role==='admin'&&<Button $variant="secondary" onClick={onInvite}><Icon name="add" size={17}/><span className="invite-label">Invite a friend</span></Button>}{onSignOut&&<Button $variant="quiet" className="sign-out" onClick={onSignOut}>Sign out</Button>}<IconButton aria-label="Log a send" onClick={onLogSend}><Icon name="send" size={18}/></IconButton></Actions></Topbar>{children}</Main>
-    <MobileNav aria-label="Main navigation">{navItems.map((item)=><MobileItem key={item.id} type="button" $active={section===item.id} onClick={()=>onNavigate(item.id)} aria-current={section===item.id?'page':undefined}><Icon name={item.icon} size={20}/><span>{item.label}</span></MobileItem>)}</MobileNav>
+    <MobileNav aria-label="Main navigation">{navItems.map((item)=><MobileItem key={item.id} type="button" $active={section===item.id} onClick={()=>onNavigate(item.id)} aria-current={section===item.id?'page':undefined}><span className="nav-icon"><NavigationIcon section={item.id} member={me}/></span><span>{item.label}</span></MobileItem>)}</MobileNav>
   </Shell>;
 }
