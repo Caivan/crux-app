@@ -6,6 +6,9 @@
     "apps/*",
     "packages/*"
   ],
+  "engines": {
+    "node": ">=20.19.0"
+  },
   "scripts": {
     "dev": "turbo dev --filter=@crux/boulder-app",
     "storybook": "yarn workspace @crux/design-system storybook",

@@ -1,0 +1,11 @@
+{
+    "$schema": "https://openapi.vercel.sh/vercel.json",
+    "framework": "vite",
+    "build": {
+      "env": { "ENABLE_EXPERIMENTAL_COREPACK": "1" }
+    },
+    "installCommand": "corepack yarn install",
+    "buildCommand": "corepack yarn turbo run build --filter=@crux/boulder-app",
+    "outputDirectory": "apps/boulder-app/dist",
+    "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+}
