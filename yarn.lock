@@ -1622,6 +1622,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "crux-club@workspace:."
   dependencies:
+    jsqr: "npm:^1.4.0"
     turbo: "npm:^2.5.8"
   languageName: unknown
   linkType: soft
@@ -2053,6 +2054,13 @@ __metadata:
   version: 3.3.1
   resolution: "jsonc-parser@npm:3.3.1"
   checksum: 10c0/269c3ae0a0e4f907a914bf334306c384aabb9929bd8c99f909275ebd5c2d3bc70b9bcd119ad794f339dec9f24b6a4ee9cd5a8ab2e6435e730ad4075388fc2ab6
+  languageName: node
+  linkType: hard
+
+"jsqr@npm:^1.4.0":
+  version: 1.4.0
+  resolution: "jsqr@npm:1.4.0"
+  checksum: 10c0/69fbfe4c866a04c97b377901a166544a583bfc76b838c275efa9af058d64e5612267079b1e96ea7b6434385803571b1c6a97a43c85f4373e8afa4f4034fc916c
   languageName: node
   linkType: hard
 
