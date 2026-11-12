@@ -3,6 +3,7 @@ import { createGlobalStyle } from 'styled-components';
 export const GlobalStyle = createGlobalStyle`
   *, *::before, *::after { box-sizing: border-box; }
   html { min-width: 320px; background: var(--color-canvas); }
+  html, body { overflow-x: clip; }
   body { margin: 0; color: var(--color-text-primary); background-color: var(--color-canvas); background-image: linear-gradient(color-mix(in srgb, var(--color-canvas) 20%, transparent), color-mix(in srgb, var(--color-canvas) 20%, transparent)), url('/wall-illustration.svg'); background-size: cover; background-position: center top; background-attachment: fixed; font: 400 14px/1.5 var(--font-family-body); }
   button, input, select, textarea { font: inherit; }
   button { color: inherit; }
