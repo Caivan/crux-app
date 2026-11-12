@@ -109,8 +109,15 @@ export default function App(){
   const leaveCrew=async()=>{if(!window.confirm('Leave Amurados? You will lose access to crew activity.'))return;try{if(backend&&authState==='live'){await backend.crew.leave(data.crew.id);await signOut()}else{notify('Leaving a shared crew requires the Supabase backend.');return}}catch(error){notify(error instanceof Error?error.message:'Could not leave the crew.')}};
   const deleteAccount=async()=>{if(!window.confirm('Delete your account and all of your sends? Problems you created will stay in the global catalog anonymously. This cannot be undone.'))return;try{if(backend&&authState==='live'){await backend.crew.deleteAccount();await signOut()}else notify('Account deletion requires the Supabase backend.')}catch(error){notify(error instanceof Error?error.message:'Could not delete the account.')}};
   if(backend&&authState!=='live')return <ThemeProvider theme={cruxTheme}><GlobalStyle/><AuthScreen status={authState==='demo'?'signed-out':authState} error={authError} onGoogleSignIn={(token)=>void signIn(token)} onAcceptInvite={(token)=>void acceptInvite(token)}/></ThemeProvider>;
+  
   return <ThemeProvider theme={cruxTheme}><GlobalStyle/><AppShell data={data} section={section} onNavigate={navigate} onInvite={()=>setDialog({type:'invite'})} onLogSend={logSend} onSignOut={authState==='live'?()=>void signOut():undefined} gradeDisplay={gradeDisplay} onGradeDisplay={setGradeDisplay}>
-    <DemoBanner><b>{authState==='live'?'LIVE · PRIVATE CREW DATA':'DEMO MODE · saved on this device'}</b><span className="copy">{authState==='live'?'Amurados activity is available to crew members only.':'Connect Supabase to use Google sign-in and share Amurados data across devices.'}</span></DemoBanner>
+    {authState!=='live'&&<DemoBanner>
+      <b>{'DEMO MODE · saved on this device'}</b>
+      <span className="copy">
+        {'Connect Supabase to use Google sign-in and share Amurados data across devices.'}
+      </span>
+    </DemoBanner>}
+    
     {section==='home'&&<HomePage data={data} sends={sends} members={data.members} onLogSend={logSend} onScan={()=>setDialog({type:'scan'})} onNavigate={navigate} onViewProfile={showProfile}/>}
     {section==='problems'&&<ProblemsPage data={data} sends={sends} members={data.members} currentMemberId={data.currentMemberId} gradeDisplay={gradeDisplay} onScan={()=>setDialog({type:'scan'})} onManualSend={logSend} onLogProblemSend={(problem)=>setDialog({type:'send',problem,edit:null,lockProblem:true})}/>}
     {section==='crew'&&<CrewPage data={data} members={data.members} sends={sends} onInvite={()=>setDialog({type:'invite'})} onViewProfile={showProfile} onRemoveMember={(id)=>void removeMember(id)} gradeDisplay={gradeDisplay}/>}
