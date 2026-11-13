@@ -28,7 +28,8 @@ interface BarcodeScanner { detect(source: CanvasImageSource): Promise<BarcodeRes
 interface BarcodeScannerConstructor { new(options?: { formats: string[] }): BarcodeScanner }
 declare global { interface Window { BarcodeDetector?: BarcodeScannerConstructor } }
 
-/** Draw a video frame / bitmap onto a canvas (downscaled) and decode it with jsQR. */
+/** Draw a video frame or bitmap (optionally cropped and downscaled) for jsQR. Cropping lets
+ * photo scans retry with less background around a small route code. */
 function decodeQr(
   source: CanvasImageSource,
   width: number,
@@ -132,8 +133,8 @@ export function RouteScanDialog({ problems, members, currentMemberId, onClose, o
         await video.play();
         if (cancelled) return;
 
-        // Prefer the native detector, but keep jsQR as a fallback when the native
-        // API is present but cannot decode a particular frame/QR format.
+        // Try the browser detector first. Some browsers expose it but fail on particular
+        // frames, so jsQR still gets a chance when detection returns no result or throws.
         let native: BarcodeScanner | null = null;
         try {
           native = window.BarcodeDetector ? new window.BarcodeDetector({ formats: ['qr_code'] }) : null;
@@ -208,6 +209,8 @@ export function RouteScanDialog({ problems, members, currentMemberId, onClose, o
       const side = Math.min(width, height);
       const centerX = width / 2;
       const centerY = height * 0.46;
+      // Start with the whole photo, then trim surrounding wall detail. The last crop
+      // favors labels around the center, where route QR codes are commonly placed.
       const crops = [
         undefined,
         { x: (width - side) / 2, y: (height - side) / 2, width: side, height: side },
@@ -215,16 +218,20 @@ export function RouteScanDialog({ problems, members, currentMemberId, onClose, o
       ];
       let value: string | null = null;
       try {
+        // Native image detection is separate from the live-camera path; use it here too
+        // when the browser supports BarcodeDetector.
         const native = window.BarcodeDetector ? new window.BarcodeDetector({ formats: ['qr_code'] }) : null;
         if (native) value = (await native.detect(bitmap))[0]?.rawValue ?? null;
       } catch {
-        // Use the JavaScript decoders when the browser's native detector is unavailable or fails.
+        // Continue with JavaScript decoders if native image detection is unavailable or fails.
       }
       for (const crop of crops) {
         if (value) break;
         value = decodeQr(bitmap, width, height, 1600, canvas, ctx, 'attemptBoth', crop);
       }
       if (!value) {
+        // jsQR can miss difficult photos, so try ZXing as an independent decoder. Load it
+        // only on demand to avoid adding its bundle cost to users whose scans already worked.
         const imageUrl = URL.createObjectURL(file);
         try {
           const image = new Image();
