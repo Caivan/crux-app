@@ -1,53 +1,17 @@
 import type { AttemptCategory, Grade, Member, Problem } from '@crux/shared-types';
 import type { SendDraft } from '../sends/SendDialog';
 
-import jsQR from 'jsqr';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { localDateString } from '../../domain/date';
 import { Icon } from '../../components/Icons';
 import { Button, Eyebrow, Field, Input, ModalBackdrop, ModalCard, Pill, Row, SectionTitle, Stack } from '../../components/ui';
 import { DialogFooter, SendFormFields } from '../sends/SendFormFields';
 import { GradePicker } from '../sends/GradePicker';
+import { createRouteQrScanner } from './qr-scanning/route-qr-scanner';
+import { routeIdentifier } from './qr-scanning/route-qr-url';
 
 const DEFAULT_NAMES = ['Gravity snacks', 'Mushroom kingdom', 'Tiny victories', 'Chalk and awe', 'Good noodles', 'Purple haze', 'Side quest'];
 const randomName = () => DEFAULT_NAMES[Math.floor(Math.random() * DEFAULT_NAMES.length)];
-
-export function routeIdentifier(raw: string): string | null {
-  try {
-    const url = new URL(raw.trim());
-    if (url.protocol !== 'https:' && url.protocol !== 'http:') return null;
-    const segment = url.pathname.replace(/\/+$/, '').split('/').filter(Boolean).at(-1);
-    return segment || null;
-  } catch {
-    return null;
-  }
-}
-
-interface BarcodeResult { rawValue: string }
-interface BarcodeScanner { detect(source: CanvasImageSource): Promise<BarcodeResult[]> }
-interface BarcodeScannerConstructor { new(options?: { formats: string[] }): BarcodeScanner }
-declare global { interface Window { BarcodeDetector?: BarcodeScannerConstructor } }
-
-/** Draw a video frame or bitmap (optionally cropped and downscaled) for jsQR. Cropping lets
- * photo scans retry with less background around a small route code. */
-function decodeQr(
-  source: CanvasImageSource,
-  width: number,
-  height: number,
-  maxSide: number,
-  canvas: HTMLCanvasElement,
-  ctx: CanvasRenderingContext2D,
-  inversion: 'dontInvert' | 'attemptBoth',
-  crop?: { x: number; y: number; width: number; height: number },
-): string | null {
-  const region = crop ?? { x: 0, y: 0, width, height };
-  const scale = Math.min(1, maxSide / Math.max(region.width, region.height));
-  canvas.width = Math.max(1, Math.round(region.width * scale));
-  canvas.height = Math.max(1, Math.round(region.height * scale));
-  ctx.drawImage(source, region.x, region.y, region.width, region.height, 0, 0, canvas.width, canvas.height);
-  const img = ctx.getImageData(0, 0, canvas.width, canvas.height);
-  return jsQR(img.data, img.width, img.height, { inversionAttempts: inversion })?.data || null;
-}
 
 export function RouteScanDialog({ problems, members, currentMemberId, onClose, onExisting, onCreate }: {
   problems: Problem[];
@@ -70,6 +34,7 @@ export function RouteScanDialog({ problems, members, currentMemberId, onClose, o
   const [cameraMessage, setCameraMessage] = useState('');
   const videoRef = useRef<HTMLVideoElement>(null);
   const photoInputRef = useRef<HTMLInputElement>(null);
+  const qrScanner = useMemo(() => createRouteQrScanner(), []);
 
   const checkUrl = (value: string) => {
     const routeId = routeIdentifier(value);
@@ -99,9 +64,6 @@ export function RouteScanDialog({ problems, members, currentMemberId, onClose, o
     let stream: MediaStream | null = null;
     let timer: number | undefined;
     let cancelled = false;
-
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d', { willReadFrequently: true });
 
     const fail = (message: string) => {
       if (cancelled) return;
@@ -133,35 +95,16 @@ export function RouteScanDialog({ problems, members, currentMemberId, onClose, o
         await video.play();
         if (cancelled) return;
 
-        // Try the browser detector first. Some browsers expose it but fail on particular
-        // frames, so jsQR still gets a chance when detection returns no result or throws.
-        let native: BarcodeScanner | null = null;
-        try {
-          native = window.BarcodeDetector ? new window.BarcodeDetector({ formats: ['qr_code'] }) : null;
-        } catch {
-          native = null;
-        }
-
         setCameraMessage('Hold the route QR code inside the frame.');
 
         const tick = async () => {
           if (cancelled) return;
           if (video.readyState >= 2 && video.videoWidth) {
             let value: string | null = null;
-            if (native) {
-              try {
-                const found = await native.detect(video);
-                value = found[0]?.rawValue ?? null;
-              } catch {
-                /* Fall back to jsQR for frames the native detector rejects. */
-              }
-            }
-            if (!value && ctx) {
-              try {
-                value = decodeQr(video, video.videoWidth, video.videoHeight, 640, canvas, ctx, 'dontInvert');
-              } catch {
-                /* frame not ready; keep scanning */
-              }
+            try {
+              value = await qrScanner.scanVideoFrame(video);
+            } catch {
+              /* Frame not ready; keep scanning. */
             }
 
             if (value && !cancelled) {
@@ -193,7 +136,7 @@ export function RouteScanDialog({ problems, members, currentMemberId, onClose, o
       stream?.getTracks().forEach((t) => t.stop());
       if (videoRef.current) videoRef.current.srcObject = null;
     };
-  }, [camera]);
+  }, [camera, qrScanner]);
 
   const onPhoto = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -201,52 +144,7 @@ export function RouteScanDialog({ problems, members, currentMemberId, onClose, o
     if (!file) return;
     setCameraMessage('');
     try {
-      const bitmap = await createImageBitmap(file);
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d', { willReadFrequently: true });
-      if (!ctx) throw new Error('no canvas');
-      const { width, height } = bitmap;
-      const side = Math.min(width, height);
-      const centerX = width / 2;
-      const centerY = height * 0.46;
-      // Start with the whole photo, then trim surrounding wall detail. The last crop
-      // favors labels around the center, where route QR codes are commonly placed.
-      const crops = [
-        undefined,
-        { x: (width - side) / 2, y: (height - side) / 2, width: side, height: side },
-        { x: Math.max(0, centerX - side * 0.36), y: Math.max(0, centerY - side * 0.36), width: Math.min(width, side * 0.72), height: Math.min(height, side * 0.72) },
-      ];
-      let value: string | null = null;
-      try {
-        // Native image detection is separate from the live-camera path; use it here too
-        // when the browser supports BarcodeDetector.
-        const native = window.BarcodeDetector ? new window.BarcodeDetector({ formats: ['qr_code'] }) : null;
-        if (native) value = (await native.detect(bitmap))[0]?.rawValue ?? null;
-      } catch {
-        // Continue with JavaScript decoders if native image detection is unavailable or fails.
-      }
-      for (const crop of crops) {
-        if (value) break;
-        value = decodeQr(bitmap, width, height, 1600, canvas, ctx, 'attemptBoth', crop);
-      }
-      if (!value) {
-        // jsQR can miss difficult photos, so try ZXing as an independent decoder. Load it
-        // only on demand to avoid adding its bundle cost to users whose scans already worked.
-        const imageUrl = URL.createObjectURL(file);
-        try {
-          const image = new Image();
-          image.src = imageUrl;
-          await image.decode();
-          const { BrowserQRCodeReader } = await import('@zxing/browser');
-          const result = await new BrowserQRCodeReader().decodeFromImageElement(image);
-          value = result.getText();
-        } catch {
-          // Keep the regular no-code message if both decoders fail.
-        } finally {
-          URL.revokeObjectURL(imageUrl);
-        }
-      }
-      bitmap.close();
+      const value = await qrScanner.scanPhoto(file);
       if (value) {
         checkUrl(value);
       } else {
