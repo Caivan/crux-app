@@ -13,7 +13,7 @@ const Sidebar = styled.aside`
   @media ${mediaQueries.lg} { display: flex; }
 `;
 const Brand = styled.div`display: flex; align-items: center; gap: 10px; padding: 3px 7px; font: 700 22px var(--font-family-display); letter-spacing: -.06em;`;
-const BrandMark = styled.span`display: grid; width: 34px; height: 34px; place-items: center; border-radius: 11px; color: var(--primitive-color-plum-800); background: var(--primitive-color-lime-400); transform: rotate(-7deg); font-size: 17px;`;
+const BrandMark = styled.img`display: block; width: 34px; height: 34px; border-radius: 10px;`;
 const HomeCard = styled.div`display: flex; align-items: center; gap: 10px; padding: 12px; border: 1px solid var(--color-outline); border-radius: 15px; background: var(--color-surface); box-shadow: var(--shadow-card);`;
 const HomeIcon = styled.span`display: grid; width: 39px; height: 39px; place-items: center; border-radius: 12px; background: #e7eee2; color: var(--primitive-color-green-700);`;
 const Nav = styled.nav`display: grid; gap: 5px;`;
@@ -55,7 +55,7 @@ export function AppShell({ data, section, onNavigate, onInvite, onLogSend, onSig
   const me = data.members.find((member) => member.id === data.currentMemberId)!;
   const date = new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
   return <Shell>
-    <Sidebar><Brand><BrandMark>C</BrandMark> crux<span style={{color:'var(--color-highlight-strong)'}}>.</span></Brand>
+    <Sidebar><Brand><BrandMark src="/icons/icon.svg" alt="" /> crux<span style={{color:'var(--color-highlight-strong)'}}>.</span></Brand>
       <HomeCard><HomeIcon><ChalkBagIcon/></HomeIcon><div><small style={{display:'block',font:'10px var(--font-family-mono)',color:'var(--color-text-muted)',letterSpacing:'.08em'}}>YOUR HOME GYM</small><strong>{data.crew.homeName}</strong><div><Pill $tone="green">{data.crew.name}</Pill></div></div></HomeCard>
       <Nav aria-label="Main navigation">{navItems.map((item)=><NavItem key={item.id} type="button" $active={section===item.id} onClick={()=>onNavigate(item.id)} aria-current={section===item.id?'page':undefined}><span className="nav-icon"><NavigationIcon section={item.id} member={me}/></span>{item.label}</NavItem>)}</Nav>
       <SidebarSpacer/><MemberChip><span className="avatar-wrap"><Avatar person={me}/></span><span><b style={{display:'block'}}>{me.name}</b><small style={{color:'var(--color-text-muted)'}}>{me.role==='admin'?'Crew admin':'Crew member'}</small></span></MemberChip>
