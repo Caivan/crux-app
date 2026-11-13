@@ -25,7 +25,7 @@ export function GradePicker({
   value,
   onChange,
 }: {
-  value: Grade;
+  value: Grade | null;
   onChange: (grade: Grade) => void;
 }) {
   return (
