@@ -1,5 +1,15 @@
 export const GRADE_ORDER = ['Green', 'Yellow', 'Blue', 'Red', 'Gray', 'Black', 'Purple'] as const;
 export type Grade = (typeof GRADE_ORDER)[number];
+export const COLOR_GRADE_HUES: readonly [Grade, number | null][] = [
+  ['Green', 85],
+  ['Yellow', 45],
+  ['Blue', 204],
+  ['Red', 355],
+  // Achromatic grades have no hue; the color picker distinguishes them by brightness.
+  ['Gray', null],
+  ['Black', null],
+  ['Purple', 280],
+];
 export type GradeDisplay = 'color' | 'fontainebleau' | 'vscale';
 export type AttemptCategory = 'flash' | 'second' | 'third-plus';
 export type TimeRange = 'week' | 'month' | 'year';

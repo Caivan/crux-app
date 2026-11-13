@@ -36,7 +36,7 @@ export function RouteScanDialog({ problems, members, currentMemberId, onClose, o
   const photoInputRef = useRef<HTMLInputElement>(null);
   const qrScanner = useMemo(() => createRouteQrScanner(), []);
 
-  const checkUrl = (value: string) => {
+  const checkUrl = (value: string, suggestedGrade?: Grade) => {
     const routeId = routeIdentifier(value);
     if (!routeId) {
       setError('That URL does not contain a route identifier.');
@@ -46,6 +46,7 @@ export function RouteScanDialog({ problems, members, currentMemberId, onClose, o
     setError('');
     setUrl(value.trim());
     setIdentifier(routeId);
+    if (suggestedGrade) setGrade(suggestedGrade);
     const existing = problems.find((problem) => problem.qrIdentifier === routeId);
     if (existing) {
       onExisting(existing);
@@ -100,7 +101,7 @@ export function RouteScanDialog({ problems, members, currentMemberId, onClose, o
         const tick = async () => {
           if (cancelled) return;
           if (video.readyState >= 2 && video.videoWidth) {
-            let value: string | null = null;
+            let value: { url: string; grade?: Grade } | null = null;
             try {
               value = await qrScanner.scanVideoFrame(video);
             } catch {
@@ -109,7 +110,7 @@ export function RouteScanDialog({ problems, members, currentMemberId, onClose, o
 
             if (value && !cancelled) {
               setCameraMessage('');
-              checkUrlRef.current(value);
+              checkUrlRef.current(value.url, value.grade);
               setCamera(false);
               return;
             }
@@ -146,7 +147,7 @@ export function RouteScanDialog({ problems, members, currentMemberId, onClose, o
     try {
       const value = await qrScanner.scanPhoto(file);
       if (value) {
-        checkUrl(value);
+        checkUrl(value.url, value.grade);
       } else {
         setError('No QR code found in that photo. Try again closer, in good light, with the whole code visible.');
       }
