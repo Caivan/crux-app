@@ -1,50 +1,17 @@
 import type { AttemptCategory, Grade, Member, Problem } from '@crux/shared-types';
 import type { SendDraft } from '../sends/SendDialog';
 
-import jsQR from 'jsqr';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { localDateString } from '../../domain/date';
 import { Icon } from '../../components/Icons';
 import { Button, Eyebrow, Field, Input, ModalBackdrop, ModalCard, Pill, Row, SectionTitle, Stack } from '../../components/ui';
 import { DialogFooter, SendFormFields } from '../sends/SendFormFields';
 import { GradePicker } from '../sends/GradePicker';
+import { createRouteQrScanner } from './qr-scanning/route-qr-scanner';
+import { routeIdentifier } from './qr-scanning/route-qr-url';
 
 const DEFAULT_NAMES = ['Gravity snacks', 'Mushroom kingdom', 'Tiny victories', 'Chalk and awe', 'Good noodles', 'Purple haze', 'Side quest'];
 const randomName = () => DEFAULT_NAMES[Math.floor(Math.random() * DEFAULT_NAMES.length)];
-
-export function routeIdentifier(raw: string): string | null {
-  try {
-    const url = new URL(raw.trim());
-    if (url.protocol !== 'https:' && url.protocol !== 'http:') return null;
-    const segment = url.pathname.replace(/\/+$/, '').split('/').filter(Boolean).at(-1);
-    return segment || null;
-  } catch {
-    return null;
-  }
-}
-
-interface BarcodeResult { rawValue: string }
-interface BarcodeScanner { detect(video: HTMLVideoElement): Promise<BarcodeResult[]> }
-interface BarcodeScannerConstructor { new(options?: { formats: string[] }): BarcodeScanner }
-declare global { interface Window { BarcodeDetector?: BarcodeScannerConstructor } }
-
-/** Draw a video frame / bitmap onto a canvas (downscaled) and decode it with jsQR. */
-function decodeQr(
-  source: CanvasImageSource,
-  width: number,
-  height: number,
-  maxSide: number,
-  canvas: HTMLCanvasElement,
-  ctx: CanvasRenderingContext2D,
-  inversion: 'dontInvert' | 'attemptBoth',
-): string | null {
-  const scale = Math.min(1, maxSide / Math.max(width, height));
-  canvas.width = Math.max(1, Math.round(width * scale));
-  canvas.height = Math.max(1, Math.round(height * scale));
-  ctx.drawImage(source, 0, 0, canvas.width, canvas.height);
-  const img = ctx.getImageData(0, 0, canvas.width, canvas.height);
-  return jsQR(img.data, img.width, img.height, { inversionAttempts: inversion })?.data || null;
-}
 
 export function RouteScanDialog({ problems, members, currentMemberId, onClose, onExisting, onCreate }: {
   problems: Problem[];
@@ -56,7 +23,7 @@ export function RouteScanDialog({ problems, members, currentMemberId, onClose, o
 }) {
   const [url, setUrl] = useState('');
   const [identifier, setIdentifier] = useState('');
-  const [grade, setGrade] = useState<Grade>('Green');
+  const [grade, setGrade] = useState<Grade | null>('Green');
   const [name, setName] = useState('');
   const [logSend, setLogSend] = useState(true);
   const [memberId, setMemberId] = useState(currentMemberId);
@@ -67,8 +34,9 @@ export function RouteScanDialog({ problems, members, currentMemberId, onClose, o
   const [cameraMessage, setCameraMessage] = useState('');
   const videoRef = useRef<HTMLVideoElement>(null);
   const photoInputRef = useRef<HTMLInputElement>(null);
+  const qrScanner = useMemo(() => createRouteQrScanner(), []);
 
-  const checkUrl = (value: string) => {
+  const checkUrl = (value: string, suggestedGrade?: Grade) => {
     const routeId = routeIdentifier(value);
     if (!routeId) {
       setError('That URL does not contain a route identifier.');
@@ -78,6 +46,7 @@ export function RouteScanDialog({ problems, members, currentMemberId, onClose, o
     setError('');
     setUrl(value.trim());
     setIdentifier(routeId);
+    setGrade(suggestedGrade ?? null);
     const existing = problems.find((problem) => problem.qrIdentifier === routeId);
     if (existing) {
       onExisting(existing);
@@ -96,9 +65,6 @@ export function RouteScanDialog({ problems, members, currentMemberId, onClose, o
     let stream: MediaStream | null = null;
     let timer: number | undefined;
     let cancelled = false;
-
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d', { willReadFrequently: true });
 
     const fail = (message: string) => {
       if (cancelled) return;
@@ -130,34 +96,21 @@ export function RouteScanDialog({ problems, members, currentMemberId, onClose, o
         await video.play();
         if (cancelled) return;
 
-        // Native detector where it works, jsQR everywhere else (iOS Safari, Firefox)
-        let native: BarcodeScanner | null = null;
-        try {
-          native = window.BarcodeDetector ? new window.BarcodeDetector({ formats: ['qr_code'] }) : null;
-        } catch {
-          native = null;
-        }
-
         setCameraMessage('Hold the route QR code inside the frame.');
 
         const tick = async () => {
           if (cancelled) return;
           if (video.readyState >= 2 && video.videoWidth) {
-            let value: string | null = null;
+            let value: { url: string; grade?: Grade } | null = null;
             try {
-              if (native) {
-                const found = await native.detect(video);
-                value = found[0]?.rawValue ?? null;
-              } else if (ctx) {
-                value = decodeQr(video, video.videoWidth, video.videoHeight, 640, canvas, ctx, 'dontInvert');
-              }
+              value = await qrScanner.scanVideoFrame(video);
             } catch {
-              /* frame not ready; keep scanning */
+              /* Frame not ready; keep scanning. */
             }
 
             if (value && !cancelled) {
               setCameraMessage('');
-              checkUrlRef.current(value);
+              checkUrlRef.current(value.url, value.grade);
               setCamera(false);
               return;
             }
@@ -184,7 +137,7 @@ export function RouteScanDialog({ problems, members, currentMemberId, onClose, o
       stream?.getTracks().forEach((t) => t.stop());
       if (videoRef.current) videoRef.current.srcObject = null;
     };
-  }, [camera]);
+  }, [camera, qrScanner]);
 
   const onPhoto = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -192,14 +145,9 @@ export function RouteScanDialog({ problems, members, currentMemberId, onClose, o
     if (!file) return;
     setCameraMessage('');
     try {
-      const bitmap = await createImageBitmap(file);
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d', { willReadFrequently: true });
-      if (!ctx) throw new Error('no canvas');
-      const value = decodeQr(bitmap, bitmap.width, bitmap.height, 1280, canvas, ctx, 'attemptBoth');
-      bitmap.close();
+      const value = await qrScanner.scanPhoto(file);
       if (value) {
-        checkUrl(value);
+        checkUrl(value.url, value.grade);
       } else {
         setError('No QR code found in that photo. Try again closer, in good light, with the whole code visible.');
       }
@@ -213,6 +161,10 @@ export function RouteScanDialog({ problems, members, currentMemberId, onClose, o
     const routeId = routeIdentifier(url);
     if (!routeId) {
       setError('Enter a valid route QR URL first.');
+      return;
+    }
+    if (!grade) {
+      setError('Choose a route color / level to continue.');
       return;
     }
     const problem: Problem = {
@@ -275,7 +227,7 @@ export function RouteScanDialog({ problems, members, currentMemberId, onClose, o
           <Input
             type="url"
             value={url}
-            onChange={(event) => { setUrl(event.target.value); setError(''); setIdentifier(''); }}
+            onChange={(event) => { setUrl(event.target.value); setError(''); setIdentifier(''); setGrade(null); }}
             onBlur={(event) => { if (event.target.value.trim()) checkUrl(event.target.value); }}
             placeholder="https://beta7.app/route/…"
             required
@@ -290,13 +242,13 @@ export function RouteScanDialog({ problems, members, currentMemberId, onClose, o
           <label style={{ display: 'flex', alignItems: 'center', gap: 9, fontSize: 13 }}>
             <input type="checkbox" checked={logSend} onChange={(event) => setLogSend(event.target.checked)} /> Log a send while creating the problem
           </label>
-          {logSend && <SendFormFields members={members} currentMemberId={currentMemberId} memberId={memberId} onMemberId={setMemberId} attempt={attempt} onAttempt={setAttempt} date={date} onDate={setDate} grade={grade} firstSend />}
+          {logSend && grade && <SendFormFields members={members} currentMemberId={currentMemberId} memberId={memberId} onMemberId={setMemberId} attempt={attempt} onAttempt={setAttempt} date={date} onDate={setDate} grade={grade} firstSend />}
         </>}
       </Stack>
 
       <DialogFooter>
         <Button type="button" $variant="secondary" onClick={onClose}>Cancel</Button>
-        <Button type="submit" disabled={!identifier}>{logSend ? 'Create problem + send' : 'Create problem'}</Button>
+        <Button type="submit" disabled={!identifier || !grade}>{logSend ? 'Create problem + send' : 'Create problem'}</Button>
       </DialogFooter>
     </ModalCard>
   </ModalBackdrop>;
