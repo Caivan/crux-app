@@ -24,7 +24,7 @@ export function routeIdentifier(raw: string): string | null {
 }
 
 interface BarcodeResult { rawValue: string }
-interface BarcodeScanner { detect(video: HTMLVideoElement): Promise<BarcodeResult[]> }
+interface BarcodeScanner { detect(source: CanvasImageSource): Promise<BarcodeResult[]> }
 interface BarcodeScannerConstructor { new(options?: { formats: string[] }): BarcodeScanner }
 declare global { interface Window { BarcodeDetector?: BarcodeScannerConstructor } }
 
@@ -37,11 +37,13 @@ function decodeQr(
   canvas: HTMLCanvasElement,
   ctx: CanvasRenderingContext2D,
   inversion: 'dontInvert' | 'attemptBoth',
+  crop?: { x: number; y: number; width: number; height: number },
 ): string | null {
-  const scale = Math.min(1, maxSide / Math.max(width, height));
-  canvas.width = Math.max(1, Math.round(width * scale));
-  canvas.height = Math.max(1, Math.round(height * scale));
-  ctx.drawImage(source, 0, 0, canvas.width, canvas.height);
+  const region = crop ?? { x: 0, y: 0, width, height };
+  const scale = Math.min(1, maxSide / Math.max(region.width, region.height));
+  canvas.width = Math.max(1, Math.round(region.width * scale));
+  canvas.height = Math.max(1, Math.round(region.height * scale));
+  ctx.drawImage(source, region.x, region.y, region.width, region.height, 0, 0, canvas.width, canvas.height);
   const img = ctx.getImageData(0, 0, canvas.width, canvas.height);
   return jsQR(img.data, img.width, img.height, { inversionAttempts: inversion })?.data || null;
 }
@@ -130,7 +132,8 @@ export function RouteScanDialog({ problems, members, currentMemberId, onClose, o
         await video.play();
         if (cancelled) return;
 
-        // Native detector where it works, jsQR everywhere else (iOS Safari, Firefox)
+        // Prefer the native detector, but keep jsQR as a fallback when the native
+        // API is present but cannot decode a particular frame/QR format.
         let native: BarcodeScanner | null = null;
         try {
           native = window.BarcodeDetector ? new window.BarcodeDetector({ formats: ['qr_code'] }) : null;
@@ -144,15 +147,20 @@ export function RouteScanDialog({ problems, members, currentMemberId, onClose, o
           if (cancelled) return;
           if (video.readyState >= 2 && video.videoWidth) {
             let value: string | null = null;
-            try {
-              if (native) {
+            if (native) {
+              try {
                 const found = await native.detect(video);
                 value = found[0]?.rawValue ?? null;
-              } else if (ctx) {
-                value = decodeQr(video, video.videoWidth, video.videoHeight, 640, canvas, ctx, 'dontInvert');
+              } catch {
+                /* Fall back to jsQR for frames the native detector rejects. */
               }
-            } catch {
-              /* frame not ready; keep scanning */
+            }
+            if (!value && ctx) {
+              try {
+                value = decodeQr(video, video.videoWidth, video.videoHeight, 640, canvas, ctx, 'dontInvert');
+              } catch {
+                /* frame not ready; keep scanning */
+              }
             }
 
             if (value && !cancelled) {
@@ -196,7 +204,41 @@ export function RouteScanDialog({ problems, members, currentMemberId, onClose, o
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d', { willReadFrequently: true });
       if (!ctx) throw new Error('no canvas');
-      const value = decodeQr(bitmap, bitmap.width, bitmap.height, 1280, canvas, ctx, 'attemptBoth');
+      const { width, height } = bitmap;
+      const side = Math.min(width, height);
+      const centerX = width / 2;
+      const centerY = height * 0.46;
+      const crops = [
+        undefined,
+        { x: (width - side) / 2, y: (height - side) / 2, width: side, height: side },
+        { x: Math.max(0, centerX - side * 0.36), y: Math.max(0, centerY - side * 0.36), width: Math.min(width, side * 0.72), height: Math.min(height, side * 0.72) },
+      ];
+      let value: string | null = null;
+      try {
+        const native = window.BarcodeDetector ? new window.BarcodeDetector({ formats: ['qr_code'] }) : null;
+        if (native) value = (await native.detect(bitmap))[0]?.rawValue ?? null;
+      } catch {
+        // Use the JavaScript decoders when the browser's native detector is unavailable or fails.
+      }
+      for (const crop of crops) {
+        if (value) break;
+        value = decodeQr(bitmap, width, height, 1600, canvas, ctx, 'attemptBoth', crop);
+      }
+      if (!value) {
+        const imageUrl = URL.createObjectURL(file);
+        try {
+          const image = new Image();
+          image.src = imageUrl;
+          await image.decode();
+          const { BrowserQRCodeReader } = await import('@zxing/browser');
+          const result = await new BrowserQRCodeReader().decodeFromImageElement(image);
+          value = result.getText();
+        } catch {
+          // Keep the regular no-code message if both decoders fail.
+        } finally {
+          URL.revokeObjectURL(imageUrl);
+        }
+      }
       bitmap.close();
       if (value) {
         checkUrl(value);
