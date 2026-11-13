@@ -1,0 +1,26 @@
+{
+  "id": "/",
+  "name": "crux — Bouldering",
+  "short_name": "crux",
+  "description": "Track your bouldering climbs and share your progress with your crew.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#fbf2f5",
+  "theme_color": "#fbf2f5",
+  "icons": [
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/maskable.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}
