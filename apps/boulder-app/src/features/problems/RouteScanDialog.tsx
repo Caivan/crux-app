@@ -23,7 +23,7 @@ export function RouteScanDialog({ problems, members, currentMemberId, onClose, o
 }) {
   const [url, setUrl] = useState('');
   const [identifier, setIdentifier] = useState('');
-  const [grade, setGrade] = useState<Grade>('Green');
+  const [grade, setGrade] = useState<Grade | null>('Green');
   const [name, setName] = useState('');
   const [logSend, setLogSend] = useState(true);
   const [memberId, setMemberId] = useState(currentMemberId);
@@ -46,7 +46,7 @@ export function RouteScanDialog({ problems, members, currentMemberId, onClose, o
     setError('');
     setUrl(value.trim());
     setIdentifier(routeId);
-    if (suggestedGrade) setGrade(suggestedGrade);
+    setGrade(suggestedGrade ?? null);
     const existing = problems.find((problem) => problem.qrIdentifier === routeId);
     if (existing) {
       onExisting(existing);
@@ -163,6 +163,10 @@ export function RouteScanDialog({ problems, members, currentMemberId, onClose, o
       setError('Enter a valid route QR URL first.');
       return;
     }
+    if (!grade) {
+      setError('Choose a route color / level to continue.');
+      return;
+    }
     const problem: Problem = {
       id: `problem-${crypto.randomUUID()}`,
       name: name.trim() || 'New route',
@@ -223,7 +227,7 @@ export function RouteScanDialog({ problems, members, currentMemberId, onClose, o
           <Input
             type="url"
             value={url}
-            onChange={(event) => { setUrl(event.target.value); setError(''); setIdentifier(''); }}
+            onChange={(event) => { setUrl(event.target.value); setError(''); setIdentifier(''); setGrade(null); }}
             onBlur={(event) => { if (event.target.value.trim()) checkUrl(event.target.value); }}
             placeholder="https://beta7.app/route/…"
             required
@@ -238,13 +242,13 @@ export function RouteScanDialog({ problems, members, currentMemberId, onClose, o
           <label style={{ display: 'flex', alignItems: 'center', gap: 9, fontSize: 13 }}>
             <input type="checkbox" checked={logSend} onChange={(event) => setLogSend(event.target.checked)} /> Log a send while creating the problem
           </label>
-          {logSend && <SendFormFields members={members} currentMemberId={currentMemberId} memberId={memberId} onMemberId={setMemberId} attempt={attempt} onAttempt={setAttempt} date={date} onDate={setDate} grade={grade} firstSend />}
+          {logSend && grade && <SendFormFields members={members} currentMemberId={currentMemberId} memberId={memberId} onMemberId={setMemberId} attempt={attempt} onAttempt={setAttempt} date={date} onDate={setDate} grade={grade} firstSend />}
         </>}
       </Stack>
 
       <DialogFooter>
         <Button type="button" $variant="secondary" onClick={onClose}>Cancel</Button>
-        <Button type="submit" disabled={!identifier}>{logSend ? 'Create problem + send' : 'Create problem'}</Button>
+        <Button type="submit" disabled={!identifier || !grade}>{logSend ? 'Create problem + send' : 'Create problem'}</Button>
       </DialogFooter>
     </ModalCard>
   </ModalBackdrop>;

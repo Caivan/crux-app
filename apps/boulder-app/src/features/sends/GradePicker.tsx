@@ -16,7 +16,7 @@ const Option = styled.button<{ $selected:boolean; $grade:Grade }>`
   .points{color:var(--color-text-muted);font:10px var(--font-family-mono)}
 `;
 
-export function GradePicker({value,onChange}:{value:Grade;onChange:(grade:Grade)=>void}){
+export function GradePicker({value,onChange}:{value:Grade|null;onChange:(grade:Grade)=>void}){
   return <Grid role="radiogroup" aria-label="Level completed">
     {GRADES.map(({grade,points})=><Option key={grade} type="button" role="radio" aria-checked={value===grade} aria-label={`${grade}, ${points} points`} $selected={value===grade} $grade={grade} onClick={()=>onChange(grade)}>
       <HoldIcon grade={grade}/><span className="name">{grade}</span><span className="points">{points} pts</span>
