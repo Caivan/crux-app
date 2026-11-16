@@ -2,9 +2,12 @@ import { Avatar } from '@crux/design-system';
 import type { Member } from '@crux/shared-types';
 import styled from 'styled-components';
 
-const Group = styled.div`display:flex;gap:8px;overflow-x:auto;padding:3px 1px 5px;scrollbar-width:thin;`;
+const Group = styled.div`
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(64px,1fr));gap:8px;
+  max-height:174px;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;padding:3px 5px 5px 1px;
+`;
 const Option = styled.button<{ $selected:boolean }>`
-  position:relative;display:grid;flex:1 0 64px;max-width:88px;min-width:64px;min-height:78px;align-content:center;justify-items:center;gap:5px;padding:7px 4px;
+  position:relative;display:grid;width:100%;min-width:0;min-height:78px;align-content:center;justify-items:center;gap:5px;padding:7px 4px;
   border:1px solid ${({$selected})=>$selected?'var(--color-outline)':'var(--color-border)'};border-radius:14px;
   background:${({$selected})=>$selected?'var(--color-highlight-soft)':'var(--color-surface)'};cursor:pointer;text-align:center;
   transition:background .15s,border-color .15s,transform .15s;&:hover{transform:translateY(-1px)}
