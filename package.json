@@ -11,12 +11,15 @@
   },
   "scripts": {
     "dev": "turbo dev --filter=@crux/boulder-app",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "storybook": "yarn workspace @crux/design-system storybook",
     "build-storybook": "yarn workspace @crux/design-system build-storybook",
     "build": "turbo build",
     "clean": "turbo clean"
   },
   "devDependencies": {
+    "prettier": "^3.10.1",
     "turbo": "^2.5.8"
   },
   "dependencies": {
