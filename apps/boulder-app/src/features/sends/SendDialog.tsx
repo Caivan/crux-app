@@ -9,10 +9,10 @@ import { GradePicker } from './GradePicker';
 import { DialogFooter, LockedProblemCard, SendFormFields } from './SendFormFields';
 
 const DialogHeader = styled(Row)`
-  justify-content: space-between;
-  align-items: flex-start;
+  position: relative;
 
-  > div { min-width: 0; }
+  > div { width: 100%; min-width: 0; }
+  > button { position: absolute; top: 0; right: 0; }
 `;
 
 const SendTypeTabs = styled.div`
