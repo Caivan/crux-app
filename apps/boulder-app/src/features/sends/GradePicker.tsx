@@ -3,7 +3,10 @@ import type { Grade } from '@crux/shared-types';
 import styled from 'styled-components';
 import { GRADE_COLORS, GRADES } from '../../domain/catalog';
 
-const Grid = styled.div`display:grid;grid-template-columns:repeat(auto-fit,minmax(64px,1fr));gap:8px;`;
+const Grid = styled.div`
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(min(64px,100%),1fr));gap:8px;
+  max-height:180px;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;padding:2px 3px 4px 1px;
+`;
 const Option = styled.button<{ $selected:boolean; $grade:Grade }>`
   display:grid;min-width:0;min-height:78px;align-content:center;justify-items:center;gap:3px;padding:7px 4px;
   border:1px solid ${({$selected,$grade})=>$selected?GRADE_COLORS[$grade]:'var(--color-border)'};
