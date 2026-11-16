@@ -9,15 +9,16 @@ import { ClimberPicker } from './ClimberPicker';
 
 export const DialogFooter=styled(Row)`
   position:sticky;bottom:calc(-1 * clamp(20px,4vw,34px));z-index:2;justify-content:flex-end;
+  flex-wrap:wrap;
   margin:18px calc(-1 * clamp(20px,4vw,34px)) calc(-1 * clamp(20px,4vw,34px));
   padding:12px clamp(20px,4vw,34px) clamp(20px,4vw,34px);
   border-top:1px solid var(--color-border);background:var(--color-surface);
 `;
 
 export function LockedProblemCard({problem,gradeDisplay}:{problem:Pick<Problem,'name'|'grade'>;gradeDisplay:GradeDisplay}){
-  return <div style={{display:'flex',alignItems:'center',gap:9,padding:'8px 10px',borderRadius:10,background:'var(--color-surface-subtle)'}}>
-    <HoldIcon grade={problem.grade}/><b>{problem.name}</b>
-    <span style={{color:GRADE_COLORS[problem.grade],marginLeft:'auto'}}>{gradeLabel(problem.grade,gradeDisplay)}</span>
+  return <div style={{display:'flex',alignItems:'center',gap:9,minWidth:0,padding:'8px 10px',borderRadius:10,background:'var(--color-surface-subtle)'}}>
+    <HoldIcon grade={problem.grade}/><b style={{minWidth:0,overflowWrap:'anywhere'}}>{problem.name}</b>
+    <span style={{color:GRADE_COLORS[problem.grade],marginLeft:'auto',flexShrink:0}}>{gradeLabel(problem.grade,gradeDisplay)}</span>
   </div>;
 }
 
