@@ -13,6 +13,8 @@
     "@crux/backend-services": "workspace:*",
     "@crux/design-system": "workspace:*",
     "@crux/shared-types": "workspace:*",
+    "@zxing/browser": "^0.2.1",
+    "@zxing/library": "^0.23.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "styled-components": "^6.1.0"
